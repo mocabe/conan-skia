@@ -4,6 +4,8 @@ from conan.tools.build.flags import cppstd_flag
 from conan.tools.build import check_min_cppstd
 from conan.tools.microsoft import is_msvc
 from conan.tools.microsoft.visual import msvc_runtime_flag
+from conan.tools.apple import is_apple_os
+from conan.tools.gnu import AutotoolsToolchain
 
 from os.path import join
 
@@ -144,8 +146,15 @@ class ConanSkia(ConanFile):
         "fPIC": True,
     } | _skia_default_options
 
-    def _is_ios_variant(self, os):
+    def _is_ios_variant(self):
+        os = self.settings.os
         return (os == "iOS" or os == "watchOS" or os == "tvOS" or os == "visionOS")
+
+    def _is_ios_variant_simulator(self):
+        if self._is_ios_variant():
+            sdk = self.settings.os.sdk
+            return (sdk == "iphonesimulator" or sdk == "watchsimulator" or sdk == "appletvsimulator" or sdk == "xrsimulator")
+        return False
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -188,7 +197,7 @@ class ConanSkia(ConanFile):
             self.options.use_fontconfig = enabled
 
         if self.options.use_fonthost_mac == None:
-            enabled = (os == "Macos" or self._is_ios_variant(os))
+            enabled = (os == "Macos" or self._is_ios_variant())
             self.options.use_fonthost_mac = enabled
 
         if self.options.use_perfetto == None:
@@ -254,7 +263,7 @@ class ConanSkia(ConanFile):
         if self.options.gl_standard == None:
             if os == "Macos":
                 self.options.gl_standard = "gl"
-            elif self._is_ios_variant(os):
+            elif self._is_ios_variant():
                 self.options.gl_standard = "gles"
             elif arch == "wasm":
                 self.options.gl_standard = "webgl"
@@ -406,6 +415,12 @@ class ConanSkia(ConanFile):
                 args += f"ndk = \"{ndk_path}\"\n"
             args += f"ndk_api = {self.settings.os.api_level}\n"
 
+        if self._is_ios_variant():
+            args += f"target_os = ios\n"
+
+        if self._is_ios_variant_simulator():
+            args += f"ios_use_simulator = true\n"
+
         if self.settings.arch == "x86_64":
             args += "target_cpu = \"x64\"\n"
         else:
@@ -428,6 +443,11 @@ class ConanSkia(ConanFile):
             fpic = self.options.get_safe("fPIC")
             if fpic != None:
                 cflags += ["-fPIC"]
+
+        if is_apple_os(self):
+            min_version_flag = AutotoolsToolchain(self).apple_min_version_flag
+            cflags += min_version_flag
+            ldflags += min_version_flag
 
         cflags += [f"-D{define}" for define in self.conf.get("tools.build:defines", default=[], check_type=list)]
         ldflags += self.conf.get("tools.build:sharedlinkflags", default=[], check_type=list)
