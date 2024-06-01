@@ -287,32 +287,32 @@ class ConanSkia(ConanFile):
         apply_conandata_patches(self)
 
     def requirements(self):
-        self.tool_requires("depot_tools/20200407")
-        self.tool_requires("ninja/1.12.1")
+        self.tool_requires("depot_tools/[>=20200407]")
+        self.tool_requires("ninja/[>=1.11.0]")
 
         if self.options.use_freetype and self.options.use_system_freetype:
-            self.requires("freetype/2.13.2")
+            self.requires("freetype/[>=2.11.1]")
 
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz:
-            self.requires("harfbuzz/8.3.0", options = {"with_subset":True})
+            self.requires("harfbuzz/[>=7.3.0]", options = {"with_subset":True})
 
         if self.options.use_expat and self.options.use_system_expat:
-            self.requires("expat/2.6.2")
+            self.requires("expat/[>=2.5.0]")
 
         if self.options.use_icu and self.options.use_system_icu:
-            self.requires("icu/74.2")
+            self.requires("icu/[>=68.2]")
 
         if (self.options.use_libpng_decode or self.options.use_libpng_encode) and self.options.use_system_libpng:
-            self.requires("libpng/1.6.43")
+            self.requires("libpng/[>=1.6.32]")
 
         if (self.options.use_libjpeg_turbo_decode or self.options.use_libjpeg_turbo_encode) and self.options.use_system_libjpeg_turbo:
-            self.requires("libjpeg-turbo/3.0.3")
+            self.requires("libjpeg-turbo/[>=3.0.0]")
 
         if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp:
-            self.requires("libwebp/1.4.0", options = {"swap_16bit_csp":True})
+            self.requires("libwebp/[>=1.2.4]", options = {"swap_16bit_csp":True})
 
         if self.options.use_zlib and self.options.use_system_zlib:
-            self.requires("zlib/1.3.1")
+            self.requires("zlib/[>=1.2.11]")
 
     def layout(self):
         src_folder = "src"
