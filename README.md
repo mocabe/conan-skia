@@ -27,7 +27,7 @@ Tested on following OS (with default options):
 | OS            | shared | static |
 | ------------- | ------ | ------ |
 | Windows       | [x]    | [x]    |
-| Macos         | [ ]    | [ ]    |
+| Macos         | [x]    | [x]    |
 | iOS           | [ ]    | [ ]    |
 | Linux         | [x]    | [x]    |
 | Android       | [ ]    | [ ]    |
