@@ -28,6 +28,7 @@ Tested on following OS (with default options):
 | ------------- | ------ | ------ |
 | Windows       | [x]    | [x]    |
 | Macos         | [ ]    | [ ]    |
+| iOS           | [ ]    | [ ]    |
 | Linux         | [x]    | [x]    |
 | Android       | [ ]    | [ ]    |
 | Emscripten    | [ ]    | [ ]    |
