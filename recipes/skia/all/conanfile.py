@@ -75,8 +75,8 @@ class ConanSkia(ConanFile):
         "enable_fontmgr_custom_embedded" : [True, False],
         "enable_fontmgr_custom_empty" : [True, False],
         "enable_fontmgr_fontconfig" : [True, False],
-        "enable_fontmgr_win_gdi" : [True, False],
         "enable_fontmgr_FontConfigInterface" : [True, False],
+        "enable_fontmgr_win_gdi" : [True, False],
         # modules
         "enable_svg" : [True, False],
         "enable_skottie" : [True, False],
@@ -219,13 +219,13 @@ class ConanSkia(ConanFile):
             enabled = self.options.use_freetype and self.options.use_fontconfig
             self.options.enable_fontmgr_fontconfig = enabled
 
-        if self.options.enable_fontmgr_win_gdi == None:
-            enabled = (os == "Windows")
-            self.options.enable_fontmgr_win_gdi = enabled
-
         if self.options.enable_fontmgr_FontConfigInterface == None:
             enabled = self.options.use_freetype and self.options.use_fontconfig
             self.options.enable_fontmgr_FontConfigInterface = enabled
+
+        if self.options.enable_fontmgr_win_gdi == None:
+            enabled = (os == "Windows")
+            self.options.enable_fontmgr_win_gdi = enabled
 
         if self.options.use_piex == None:
             enabled = os != "Windows" and arch != "wasm"
@@ -326,7 +326,7 @@ class ConanSkia(ConanFile):
     def _get_lower_bool_str(self, cond):
         return "true" if cond else "false"
 
-    def _static_libs(self, cpp_info):
+    def _link_libs(self, cpp_info):
         libs = []
         libs += cpp_info.libs
         libs += cpp_info.system_libs
@@ -334,8 +334,7 @@ class ConanSkia(ConanFile):
         ext = ""
         if self.settings.os == "Windows":
             ext = ".lib"
-        else:
-            ext = ".obj"
+
         return [lib + ext for lib in libs]
 
     def build(self):
@@ -346,12 +345,12 @@ class ConanSkia(ConanFile):
 
         if self.options.use_expat and self.options.use_system_expat:
             replace_in_file(self, join(self.source_folder, "third_party", "expat", "BUILD.gn"),
-                            "libs = [ \"expat\" ]", f"libs = {json.dumps(self._static_libs(self.dependencies['expat'].cpp_info))}",
+                            "libs = [ \"expat\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['expat'].cpp_info))}",
                             strict=False)
 
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz:
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
-                            "libs = [ \"harfbuzz\" ]", f"libs = {json.dumps(self._static_libs(self.dependencies['harfbuzz'].cpp_info))}",
+                            "libs = [ \"harfbuzz\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['harfbuzz'].cpp_info))}",
                             strict=False)
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
                             "libs += [ \"harfbuzz-subset\" ]", "libs += [ ]", 
@@ -359,7 +358,7 @@ class ConanSkia(ConanFile):
 
         if self.options.use_freetype and self.options.use_system_freetype:
             replace_in_file(self, join(self.source_folder, "third_party", "freetype2", "BUILD.gn"),
-                            "libs = [ skia_system_freetype2_lib ]", f"libs = {json.dumps(self._static_libs(self.dependencies['freetype'].cpp_info))}",
+                            "libs = [ skia_system_freetype2_lib ]", f"libs = {json.dumps(self._link_libs(self.dependencies['freetype'].cpp_info))}",
                             strict=False)
             replace_in_file(self, join(self.source_folder, "third_party", "freetype2", "BUILD.gn"),
                             "include_dirs = [ skia_system_freetype2_include_path ]", "include_dirs = [ ]", 
@@ -367,29 +366,29 @@ class ConanSkia(ConanFile):
 
         if self.options.use_icu and self.options.use_system_icu:
             replace_in_file(self, join(self.source_folder, "third_party", "icu", "BUILD.gn"),
-                            "libs = [ \"icuuc\" ]", f"libs = {json.dumps(self._static_libs(self.dependencies['icu'].cpp_info.components['icu-uc']) + self._static_libs(self.dependencies['icu'].cpp_info.components['icu-data']))}",
+                            "libs = [ \"icuuc\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['icu'].cpp_info.components['icu-uc']) + self._link_libs(self.dependencies['icu'].cpp_info.components['icu-data']))}",
                             strict=False)
 
         if (self.options.use_libjpeg_turbo_encode or self.options.use_libjpeg_turbo_decode) and self.options.use_system_libjpeg_turbo:
             replace_in_file(self, join(self.source_folder, "third_party", "libjpeg-turbo", "BUILD.gn"),
-                            "libs = [ \"jpeg\" ]", f"libs = {json.dumps(self._static_libs(self.dependencies['libjpeg-turbo'].cpp_info.components['jpeg']))}",
+                            "libs = [ \"jpeg\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['libjpeg-turbo'].cpp_info.components['jpeg']))}",
                             strict=False)
 
         if (self.options.use_libpng_encode or self.options.use_libpng_decode) and self.options.use_system_libpng:
             replace_in_file(self, join(self.source_folder, "third_party", "libpng", "BUILD.gn"),
-                            "libs = [ \"png\" ]", f"libs = {json.dumps(self._static_libs(self.dependencies['libpng'].cpp_info))}",
+                            "libs = [ \"png\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['libpng'].cpp_info))}",
                             strict=False)
 
         if self.options.use_zlib and self.options.use_system_zlib:
             replace_in_file(self, join(self.source_folder, "third_party", "zlib", "BUILD.gn"),
-                            "libs = [ \"z\" ]", f"libs = {json.dumps(self._static_libs(self.dependencies['zlib'].cpp_info))}",
+                            "libs = [ \"z\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['zlib'].cpp_info))}",
                             strict=False)
 
         if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp:
             libwebp_info = self.dependencies['libwebp'].cpp_info
             replace_in_file(self, join(self.source_folder, "third_party", "libwebp", "BUILD.gn"),
                             "    libs = [\n      \"webp\",\n      \"webpdemux\",\n      \"webpmux\",\n    ]",
-                            f"    libs = {json.dumps(self._static_libs(libwebp_info.components['webp']) + self._static_libs(libwebp_info.components['webpmux']) + self._static_libs(libwebp_info.components['webpdemux']) + self._static_libs(libwebp_info.components['sharpyuv']))}",
+                            f"    libs = {json.dumps(self._link_libs(libwebp_info.components['webp']) + self._link_libs(libwebp_info.components['webpmux']) + self._link_libs(libwebp_info.components['webpdemux']) + self._link_libs(libwebp_info.components['sharpyuv']))}",
                             strict=False)
 
         args = ""
@@ -460,7 +459,7 @@ class ConanSkia(ConanFile):
         if self.settings.os == "Windows":
             self.run("bin\gn gen out/conan")
         else:
-            self.run("bin/bn gen out/conan")
+            self.run("bin/gn gen out/conan")
 
         self.run("ninja -C out/conan")
 
@@ -495,6 +494,7 @@ class ConanSkia(ConanFile):
         else:
             copy(self, "*.lib", build_folder_out, package_folder_lib, keep_path=False)
 
+        copy(self, "*.a", build_folder_out, package_folder_lib, keep_path=False)
         copy(self, "*.so", build_folder_out, package_folder_lib, keep_path=False)
         copy(self, "*.dylib", build_folder_out, package_folder_lib, keep_path=False)
 
@@ -575,6 +575,13 @@ class ConanSkia(ConanFile):
             self.cpp_info.defines += ["SK_CODEC_DECODES_GIF"]
             self.cpp_info.libs += ["wuffs"]
 
+        if self.options.use_piex and not self.options.shared:
+            self.cpp_info.libs += ["piex"]
+
+        if self.options.use_dng_sdk and not self.options.shared:
+            self.cpp_info.defines += ["qDNGBigEndian=0"]
+            self.cpp_info.libs += ["dng_sdk"]
+
         if self.options.use_libpng_decode:
             self.cpp_info.defines += ["SK_CODEC_DECODES_ICO"]
             self.cpp_info.defines += ["SK_CODEC_DECODES_PNG"]
@@ -615,7 +622,7 @@ class ConanSkia(ConanFile):
         if self.options.enable_fontmgr_fontconfig:
             self.cpp_info.defines += ["SK_FONTMGR_FONTCONFIG_AVAILABLE"]
 
-        if self.options.enable_fontmgr_FontConfigInterface:
+        if self.options.enable_fontmgr_win_gdi:
             self.cpp_info.defines += ["SK_FONTMGR_GDI_AVAILABLE"]
             self.cpp_info.system_libs += ["gdi32"]
 
