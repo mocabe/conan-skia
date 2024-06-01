@@ -483,20 +483,23 @@ class ConanSkia(ConanFile):
         # skcms doesn't have include folder for some reason.
         copy(self, "*.h", join(source_folder_modules, "skcms"), join(package_folder_include_modules, "skcms"))
 
-        if self.settings.os == "Windows" and self.options.shared:
-            copy(self, "*.dll", build_folder_out, package_folder_bin, keep_path=False)
-            copy(self, "*.dll.lib", build_folder_out, package_folder_lib, keep_path=False)
-            # rename: *.dll.lib -> *.lib
-            for filename in os.listdir(package_folder_lib):
-                if filename.endswith(".dll.lib"):
-                    new_filename = filename.replace(".dll.lib", ".lib")
-                    rename(self, join(package_folder_lib, filename), join(package_folder_lib, new_filename))
+        if self.settings.os == "Windows":
+            if self.options.shared:
+                copy(self, "*.dll", build_folder_out, package_folder_bin, keep_path=False)
+                copy(self, "*.dll.lib", build_folder_out, package_folder_lib, keep_path=False)
+                # rename: *.dll.lib -> *.lib
+                for filename in os.listdir(package_folder_lib):
+                    if filename.endswith(".dll.lib"):
+                        new_filename = filename.replace(".dll.lib", ".lib")
+                        rename(self, join(package_folder_lib, filename), join(package_folder_lib, new_filename))
+            else:
+                copy(self, "*.lib", build_folder_out, package_folder_lib, keep_path=False)
         else:
-            copy(self, "*.lib", build_folder_out, package_folder_lib, keep_path=False)
-
-        copy(self, "*.a", build_folder_out, package_folder_lib, keep_path=False)
-        copy(self, "*.so", build_folder_out, package_folder_lib, keep_path=False)
-        copy(self, "*.dylib", build_folder_out, package_folder_lib, keep_path=False)
+            if self.options.shared:
+                copy(self, "*.so", build_folder_out, package_folder_lib, keep_path=False)
+                copy(self, "*.dylib", build_folder_out, package_folder_lib, keep_path=False)
+            else:
+                copy(self, "*.a", build_folder_out, package_folder_lib, keep_path=False)
 
     def package_info(self):
 
