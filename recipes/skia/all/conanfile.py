@@ -1,6 +1,7 @@
 from conan import ConanFile
 from conan.tools.files import apply_conandata_patches, export_conandata_patches, get, copy, rename, mkdir, rmdir, save, replace_in_file
 from conan.tools.build.flags import cppstd_flag
+from conan.tools.build import check_min_cppstd
 from conan.tools.microsoft import is_msvc
 from conan.tools.microsoft.visual import msvc_runtime_flag
 
@@ -152,9 +153,8 @@ class ConanSkia(ConanFile):
 
 
     def validate(self):
-        if self.settings.compiler.cppstd != None:
-            if int(self.settings.compiler.cppstd.value) < 17:
-                raise ConanInvalidConfiguration("This version of Skia only supports C++17 or later")
+        if self.settings.compiler.cppstd:
+            check_min_cppstd(self, 17)
 
     def configure(self):
         os = self.settings.os
