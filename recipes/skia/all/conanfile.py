@@ -578,7 +578,7 @@ class ConanSkia(ConanFile):
         if self.options.use_perfetto:
             self.cpp_info.defines += ["SK_USE_PERFETTO"]
 
-        if self.settings.os == "Macos" or self._is_ios_variant(self.settings.os):
+        if self.settings.os == "Macos" or self._is_ios_variant():
             if self.options.enable_api_available_macro:
                 self.cpp_info.defines += ["SK_ENABLE_API_AVAILABLE"]
             else:
