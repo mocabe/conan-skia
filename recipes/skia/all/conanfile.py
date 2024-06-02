@@ -48,6 +48,15 @@ class ConanSkia(ConanFile):
         "use_system_libpng" : [True, False],
         "use_system_libwebp" : [True, False],
         "use_system_zlib" : [True, False],
+        # conan library options 
+        "use_conan_expat" : [True, False],
+        "use_conan_freetype": [True, False],
+        "use_conan_harfbuzz" : [True, False],
+        "use_conan_icu" :[True, False],
+        "use_conan_libjpeg_turbo" : [True, False],
+        "use_conan_libpng" : [True, False],
+        "use_conan_libwebp" : [True, False],
+        "use_conan_zlib" : [True, False],
         # backend options
         "use_angle" : [True, False],
         "use_gl" : [True, False],
@@ -106,6 +115,7 @@ class ConanSkia(ConanFile):
         "use_libwebp_encode" : True,
         "use_libwebp_decode" : True,
         "use_zlib" : True,
+        # system library options 
         "use_system_expat" : True,
         "use_system_freetype": True,
         "use_system_harfbuzz" : True,
@@ -114,6 +124,15 @@ class ConanSkia(ConanFile):
         "use_system_libpng" : True,
         "use_system_libwebp" : True,
         "use_system_zlib" : True,
+        # conan library options 
+        "use_conan_expat" : True,
+        "use_conan_freetype": True,
+        "use_conan_harfbuzz" : True,
+        "use_conan_icu" : True,
+        "use_conan_libjpeg_turbo" : True,
+        "use_conan_libpng" : True,
+        "use_conan_libwebp" : True,
+        "use_conan_zlib" : True,
         # backend options
         "use_angle" : False,
         "use_gl" : True,
@@ -278,22 +297,46 @@ class ConanSkia(ConanFile):
                 self.options.gl_standard = ""
 
         # Remove unnecessary system library options.
+
         if self.options.use_expat == False:
             self.options.rm_safe("use_system_expat")
+        elif not self.options.use_system_expat: 
+            self.options.rm_safe("use_conan_expat")
+
         if self.options.use_freetype == False:
             self.options.rm_safe("use_system_freetype")
+        elif not self.options.use_system_freetype: 
+            self.options.rm_safe("use_conan_freetype")
+
         if self.options.use_icu == False:
             self.options.rm_safe("use_system_icu")
+        elif not self.options.use_system_icu: 
+            self.options.rm_safe("use_conan_icu")
+
         if self.options.use_harfbuzz == False:
             self.options.rm_safe("use_system_harfbuzz")
+        elif not self.options.use_system_harfbuzz: 
+            self.options.rm_safe("use_conan_harfbuzz")
+
         if self.options.use_libjpeg_turbo_encode == False and self.options.use_libjpeg_turbo_decode == False:
             self.options.rm_safe("use_system_libjpeg_turbo")
+        elif not self.options.use_system_libjpeg_turbo: 
+            self.options.rm_safe("use_conan_libjpeg_turbo")
+
         if self.options.use_libpng_encode == False and self.options.use_libpng_decode == False:
             self.options.rm_safe("use_system_libpng")
+        elif not self.options.use_system_libpng: 
+            self.options.rm_safe("use_conan_libpng")
+
         if self.options.use_libwebp_encode == False and self.options.use_libwebp_decode == False:
             self.options.rm_safe("use_system_libwebp")
+        elif not self.options.use_system_libwebp: 
+            self.options.rm_safe("use_conan_libwebp")
+
         if self.options.use_zlib == False:
             self.options.rm_safe("use_system_zlib")
+        elif not self.options.use_system_zlib: 
+            self.options.rm_safe("use_conan_zlib")
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -306,28 +349,28 @@ class ConanSkia(ConanFile):
         self.tool_requires("depot_tools/[>=20200407]")
         self.tool_requires("ninja/[>=1.11.0]")
 
-        if self.options.use_freetype and self.options.use_system_freetype:
+        if self.options.use_freetype and self.options.use_system_freetype and self.options.use_conan_freetype:
             self.requires("freetype/[>=2.11.1]")
 
-        if self.options.use_harfbuzz and self.options.use_system_harfbuzz:
+        if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
             self.requires("harfbuzz/[>=7.3.0]", options = {"with_subset":True})
 
-        if self.options.use_expat and self.options.use_system_expat:
+        if self.options.use_expat and self.options.use_system_expat and self.options.use_conan_expat:
             self.requires("expat/[>=2.5.0]")
 
-        if self.options.use_icu and self.options.use_system_icu:
+        if self.options.use_icu and self.options.use_system_icu and self.options.use_conan_icu:
             self.requires("icu/[>=68.2]")
 
-        if (self.options.use_libpng_decode or self.options.use_libpng_encode) and self.options.use_system_libpng:
+        if (self.options.use_libpng_decode or self.options.use_libpng_encode) and self.options.use_system_libpng and self.options.use_conan_libpng:
             self.requires("libpng/[>=1.6.32]")
 
-        if (self.options.use_libjpeg_turbo_decode or self.options.use_libjpeg_turbo_encode) and self.options.use_system_libjpeg_turbo:
+        if (self.options.use_libjpeg_turbo_decode or self.options.use_libjpeg_turbo_encode) and self.options.use_system_libjpeg_turbo and self.options.use_conan_libjpeg_turbo:
             self.requires("libjpeg-turbo/[>=3.0.0]")
 
-        if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp:
+        if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp and self.options.use_conan_libwebp:
             self.requires("libwebp/[>=1.2.4]", options = {"swap_16bit_csp":True})
 
-        if self.options.use_zlib and self.options.use_system_zlib:
+        if self.options.use_zlib and self.options.use_system_zlib and self.options.use_conan_zlib:
             self.requires("zlib/[>=1.2.11]")
 
     def layout(self):
@@ -359,12 +402,12 @@ class ConanSkia(ConanFile):
         self.run("python3 tools/git-sync-deps")
         del os.environ["GIT_SYNC_DEPS_SKIP_EMSDK"]
 
-        if self.options.use_expat and self.options.use_system_expat:
+        if self.options.use_expat and self.options.use_system_expat and self.options.use_conan_expat:
             replace_in_file(self, join(self.source_folder, "third_party", "expat", "BUILD.gn"),
                             "libs = [ \"expat\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['expat'].cpp_info))}",
                             strict=False)
 
-        if self.options.use_harfbuzz and self.options.use_system_harfbuzz:
+        if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
                             "libs = [ \"harfbuzz\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['harfbuzz'].cpp_info))}",
                             strict=False)
@@ -372,7 +415,7 @@ class ConanSkia(ConanFile):
                             "libs += [ \"harfbuzz-subset\" ]", "libs += [ ]", 
                             strict=False)
 
-        if self.options.use_freetype and self.options.use_system_freetype:
+        if self.options.use_freetype and self.options.use_system_freetype and self.options.use_conan_freetype:
             replace_in_file(self, join(self.source_folder, "third_party", "freetype2", "BUILD.gn"),
                             "libs = [ skia_system_freetype2_lib ]", f"libs = {json.dumps(self._link_libs(self.dependencies['freetype'].cpp_info))}",
                             strict=False)
@@ -380,27 +423,27 @@ class ConanSkia(ConanFile):
                             "include_dirs = [ skia_system_freetype2_include_path ]", "include_dirs = [ ]", 
                             strict=False)
 
-        if self.options.use_icu and self.options.use_system_icu:
+        if self.options.use_icu and self.options.use_system_icu and self.options.use_conan_icu:
             replace_in_file(self, join(self.source_folder, "third_party", "icu", "BUILD.gn"),
                             "libs = [ \"icuuc\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['icu'].cpp_info.components['icu-uc']) + self._link_libs(self.dependencies['icu'].cpp_info.components['icu-data']))}",
                             strict=False)
 
-        if (self.options.use_libjpeg_turbo_encode or self.options.use_libjpeg_turbo_decode) and self.options.use_system_libjpeg_turbo:
+        if (self.options.use_libjpeg_turbo_encode or self.options.use_libjpeg_turbo_decode) and self.options.use_system_libjpeg_turbo and self.options.use_conan_libjpeg_turbo:
             replace_in_file(self, join(self.source_folder, "third_party", "libjpeg-turbo", "BUILD.gn"),
                             "libs = [ \"jpeg\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['libjpeg-turbo'].cpp_info.components['jpeg']))}",
                             strict=False)
 
-        if (self.options.use_libpng_encode or self.options.use_libpng_decode) and self.options.use_system_libpng:
+        if (self.options.use_libpng_encode or self.options.use_libpng_decode) and self.options.use_system_libpng and self.options.use_conan_libpng:
             replace_in_file(self, join(self.source_folder, "third_party", "libpng", "BUILD.gn"),
                             "libs = [ \"png\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['libpng'].cpp_info))}",
                             strict=False)
 
-        if self.options.use_zlib and self.options.use_system_zlib:
+        if self.options.use_zlib and self.options.use_system_zlib and self.options.use_conan_zlib:
             replace_in_file(self, join(self.source_folder, "third_party", "zlib", "BUILD.gn"),
                             "libs = [ \"z\" ]", f"libs = {json.dumps(self._link_libs(self.dependencies['zlib'].cpp_info))}",
                             strict=False)
 
-        if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp:
+        if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp and self.options.use_conan_libwebp:
             libwebp_info = self.dependencies['libwebp'].cpp_info
             replace_in_file(self, join(self.source_folder, "third_party", "libwebp", "BUILD.gn"),
                             "    libs = [\n      \"webp\",\n      \"webpdemux\",\n      \"webpmux\",\n    ]",
@@ -474,7 +517,7 @@ class ConanSkia(ConanFile):
 
         for key in self._skia_options.keys():
             value = self.options.get_safe(key)
-            if value != None:
+            if value != None and not key.startswith("use_conan"):
                 b =  self._get_lower_bool_str(value)
                 k = "use_system_freetype2" if key == "use_system_freetype" else key
                 args += f"skia_{k}={b}\n"
