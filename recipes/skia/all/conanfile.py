@@ -72,13 +72,15 @@ class ConanSkia(ConanFile):
         "enable_ganesh" : [True, False],
         "enable_graphite" : [True, False],
         "enable_pdf" : [True, False],
+        "enable_winuwp" : [True, False],
         "enable_fontmgr_android" : [True, False],
         "enable_fontmgr_custom_directory" : [True, False],
         "enable_fontmgr_custom_embedded" : [True, False],
         "enable_fontmgr_custom_empty" : [True, False],
         "enable_fontmgr_fontconfig" : [True, False],
-        "enable_fontmgr_FontConfigInterface" : [True, False],
+        "enable_fontmgr_win" : [True, False],
         "enable_fontmgr_win_gdi" : [True, False],
+        "enable_fontmgr_FontConfigInterface" : [True, False],
         # modules
         "enable_svg" : [True, False],
         "enable_skottie" : [True, False],
@@ -126,6 +128,7 @@ class ConanSkia(ConanFile):
         # backend toggles 
         "enable_ganesh" : True,
         "enable_graphite" : False,
+        "enable_winuwp" : False,
         # modules
         "enable_skshaper" : True,
         "enable_bentleyottmann" : True,
@@ -228,13 +231,17 @@ class ConanSkia(ConanFile):
             enabled = self.options.use_freetype and self.options.use_fontconfig
             self.options.enable_fontmgr_fontconfig = enabled
 
+        if self.options.enable_fontmgr_win == None:
+            enabled = (os == "Windows") 
+            self.options.enable_fontmgr_win = enabled
+
+        if self.options.enable_fontmgr_win_gdi == None:
+            enabled = (os == "Windows") and not self.options.enable_winuwp
+            self.options.enable_fontmgr_win_gdi = enabled
+
         if self.options.enable_fontmgr_FontConfigInterface == None:
             enabled = self.options.use_freetype and self.options.use_fontconfig
             self.options.enable_fontmgr_FontConfigInterface = enabled
-
-        if self.options.enable_fontmgr_win_gdi == None:
-            enabled = (os == "Windows")
-            self.options.enable_fontmgr_win_gdi = enabled
 
         if self.options.use_piex == None:
             enabled = os != "Windows" and arch != "wasm"
