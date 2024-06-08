@@ -6,10 +6,12 @@ from conan.tools.microsoft import is_msvc
 from conan.tools.microsoft.visual import msvc_runtime_flag
 from conan.tools.apple import is_apple_os
 from conan.tools.gnu import AutotoolsToolchain
+from conan.errors import ConanInvalidConfiguration
 
 from os.path import join
 
 import os
+import re
 import json
 
 class ConanSkia(ConanFile):
@@ -186,6 +188,17 @@ class ConanSkia(ConanFile):
     def validate(self):
         if self.settings.compiler.cppstd:
             check_min_cppstd(self, 17)
+
+        if self.settings.arch == "x86":
+            pass
+        elif self.settings.arch == "x86_64":
+            pass
+        elif re.match(r'armv7.*', self.settings.arch.value):
+            pass
+        elif re.match(r'armv8.*', self.settings.arch.value):
+            pass
+        else: 
+            raise ConanInvalidConfiguration("Unsupported settings.arch")
 
     def configure(self):
         os = self.settings.os
@@ -471,10 +484,16 @@ class ConanSkia(ConanFile):
         if self._is_ios_variant_simulator():
             args += f"ios_use_simulator = true\n"
 
-        if self.settings.arch == "x86_64":
+        if self.settings.arch == "x86":
+            args += "target_cpu = \"x86\"\n"
+        elif self.settings.arch == "x86_64":
             args += "target_cpu = \"x64\"\n"
+        elif re.match("armv7.*", self.settings.arch.value):
+            args += "target_cpu = \"arm\"\n"
+        elif re.match("armv8.*", self.settings.arch.value):
+            args += "target_cpu = \"arm64\"\n"
         else:
-            args += f"target_cpu = \"{self.settings.arch}\"\n"
+            raise RuntimeError("Unexpected settings.arch")
 
         cflags = []
         ldflags = []
@@ -651,7 +670,7 @@ class ConanSkia(ConanFile):
         if self.options.use_piex and not self.options.shared:
             self.cpp_info.libs += ["piex"]
 
-        if self.options.use_dng_sdk and not self.options.shared:
+        if self.options.use_dng_sdk and self.options.use_libjpeg_turbo_decode and self.options.use_piex and not self.options.shared:
             self.cpp_info.defines += ["qDNGBigEndian=0"]
             self.cpp_info.libs += ["dng_sdk"]
 

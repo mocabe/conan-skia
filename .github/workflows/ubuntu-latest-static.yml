@@ -1,0 +1,9 @@
+name: ubuntu-latest-static
+run-name: ubuntu-latest-static
+on: [push]
+jobs:
+  conan-create:
+    uses: ./.github/workflows/main.yml
+    with:
+        runs-on: ubuntu-latest
+        conan-options: -o skia/*:shared=False

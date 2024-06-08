@@ -1,0 +1,41 @@
+name: main
+run-name: main
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        required: true
+        type: string
+      conan-options:
+        required: false
+        type: string
+      conan-profile-build:
+        required: false
+        type: string
+      conan-profile-host:
+        required: false
+        type: string
+jobs:
+  conan-create-main:
+    runs-on: ${{ inputs.runs-on }}
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+      - name: Install Conan
+        run: pip install conan
+      - name: Display Conan version
+        run: conan --version
+      - name: Detect default profile
+        run: conan profile detect
+      - name: Install OpenGL via Conan
+        run: conan install --requires=opengl/system -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True ${{ inputs.conan-options }}
+      - name: Build
+        run:  conan create recipes/skia/all --version=126.20240526.0 -s compiler.cppstd=17 --build=missing

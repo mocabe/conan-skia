@@ -27,10 +27,10 @@ Tested on following OS (with default options):
 
 | OS            | shared | static |
 | ------------- | ------ | ------ |
-| Windows       | [x]    | [x]    |
-| Macos         | [x]    | [x]    |
+| Windows         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/windows-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/windows-latest-static.yml/badge.svg) |
+| Macos         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/macos-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/macos-latest-static.yml/badge.svg) |
 | iOS           | [ ]    | [ ]    |
-| Linux         | [x]    | [x]    |
+| Linux         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ubuntu-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ubuntu-latest-static.yml/badge.svg) |
 | Android       | [ ]    | [ ]    |
 | Emscripten    | [ ]    | [ ]    |
 

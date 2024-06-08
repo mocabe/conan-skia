@@ -1,0 +1,9 @@
+name: macos-latest-shared
+run-name: macos-latest-shared
+on: [push]
+jobs:
+  conan-create:
+    uses: ./.github/workflows/main.yml
+    with:
+        runs-on: macos-latest
+        conan-options: -o skia/*:shared=True

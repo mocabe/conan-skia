@@ -1,0 +1,9 @@
+name: macos-latest-static
+run-name: macos-latest-static
+on: [push]
+jobs:
+  conan-create:
+    uses: ./.github/workflows/main.yml
+    with:
+        runs-on: macos-latest
+        conan-options: -o skia/*:shared=False
