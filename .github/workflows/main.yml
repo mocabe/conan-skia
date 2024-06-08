@@ -36,6 +36,6 @@ jobs:
       - name: Detect default profile
         run: conan profile detect
       - name: Install OpenGL via Conan
-        run: conan install --requires=opengl/system -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True ${{ inputs.conan-options }}
+        run: conan install --requires=opengl/system -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
       - name: Build
-        run:  conan create recipes/skia/all --version=126.20240526.0 -s compiler.cppstd=17 --build=missing
+        run:  conan create recipes/skia/all --version=126.20240526.0 -s compiler.cppstd=17 ${{ inputs.conan-options }} --build=missing
