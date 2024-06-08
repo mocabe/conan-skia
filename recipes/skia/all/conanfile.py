@@ -515,7 +515,7 @@ class ConanSkia(ConanFile):
         cflags = []
         ldflags = []
         asmflags = []
-        for req, dep in self.dependencies.direct_host.items():
+        for dep in self.dependencies.host.values():
             cflags += [f"-I{dir}" for dir in dep.cpp_info.includedirs]
             cflags += [f"-D{define}" for define in dep.cpp_info.defines]
             if is_msvc(self):
