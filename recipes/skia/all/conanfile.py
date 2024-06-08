@@ -497,6 +497,7 @@ class ConanSkia(ConanFile):
 
         cflags = []
         ldflags = []
+        asmflags = []
         for req, dep in self.dependencies.direct_host.items():
             cflags += [f"-I{dir}" for dir in dep.cpp_info.includedirs]
             cflags += [f"-D{define}" for define in dep.cpp_info.defines]
@@ -517,6 +518,7 @@ class ConanSkia(ConanFile):
             min_version_flag = AutotoolsToolchain(self).apple_min_version_flag
             cflags += min_version_flag
             ldflags += min_version_flag
+            asmflags += min_version_flag
 
         cflags += [f"-D{define}" for define in self.conf.get("tools.build:defines", default=[], check_type=list)]
         ldflags += self.conf.get("tools.build:sharedlinkflags", default=[], check_type=list)
@@ -525,7 +527,8 @@ class ConanSkia(ConanFile):
         linker_scripts = self.conf.get("tools.build:linker_scripts", default=[], check_type=list)
         ldflags += ["-T'" + linker_script + "'" for linker_script in linker_scripts]
 
-        cflags_c = self.conf.get("tools.build:cflags", default=[], check_type=list)
+        cflags += self.conf.get("tools.build:cflags", default=[], check_type=list)
+        cflags_c = []
         cflags_cc = self.conf.get("tools.build:cxxflags", default=[], check_type=list)
         cflags_cc += [cppstd_flag(self)]
 
@@ -533,6 +536,7 @@ class ConanSkia(ConanFile):
         args += f"extra_cflags_c={json.dumps(cflags_c)}\n"
         args += f"extra_cflags_cc={json.dumps(cflags_cc)}\n"
         args += f"extra_ldflags={json.dumps(ldflags)}\n"
+        args += f"extra_asmflags={json.dumps(asmflags)}\n"
 
         for key in self._skia_options.keys():
             value = self.options.get_safe(key)
