@@ -284,7 +284,7 @@ class ConanSkia(ConanFile):
             self.options.use_dng_sdk = enabled 
 
         if self.options.use_ndk_images == None:
-            enabled = os == "Android" and os.api_level >= 30
+            enabled = os == "Android" and int(os.api_level.value) >= 30
             self.options.use_ndk_images = enabled    
 
         if self.options.enable_svg == None:
