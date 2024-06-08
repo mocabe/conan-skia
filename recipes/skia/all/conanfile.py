@@ -398,28 +398,31 @@ class ConanSkia(ConanFile):
     def _get_lower_bool_str(self, cond):
         return "true" if cond else "false"
 
-    def _collect_link_libs(self, dependency):
+    def _collect_link_libs(self, dependency, components):
         libs = []
         libs += dependency.cpp_info.libs
         libs += dependency.cpp_info.system_libs
 
-        for component in dependency.cpp_info.components.values():
-            libs += component.libs
-            libs += component.system_libs
+        # The order of components affects link order.
+        # TODO: Sould we handle inter-component dependencies?
+        for component in components:
+            libs += dependency.cpp_info.components[component].libs
+            libs += dependency.cpp_info.components[component].system_libs
 
         for transitiveDependency in dependency.dependencies.host.values():
             libs += transitiveDependency.cpp_info.libs
             libs += transitiveDependency.cpp_info.system_libs
-            for component in transitiveDependency.cpp_info.components.values():
-                libs += component.libs
-                libs += component.system_libs
+
+            # TODO: Is there proper way to determine link order of those components?
+            for dep in transitiveDependency.cpp_info.components.values():
+                libs += dep.libs
+                libs += dep.system_libs
 
         return libs
 
-    def _link_libs(self, dependencyNames):
+    def _link_libs(self, name, components=[]):
         libs = []
-        for name in dependencyNames:
-            libs += self._collect_link_libs(self.dependencies[name])
+        libs += self._collect_link_libs(self.dependencies[name], components)
 
         ext = ""
         if self.settings.os == "Windows":
@@ -435,12 +438,12 @@ class ConanSkia(ConanFile):
 
         if self.options.use_expat and self.options.use_system_expat and self.options.use_conan_expat:
             replace_in_file(self, join(self.source_folder, "third_party", "expat", "BUILD.gn"),
-                            "libs = [ \"expat\" ]", f"libs = {json.dumps(self._link_libs(['expat']))}",
+                            "libs = [ \"expat\" ]", f"libs = {json.dumps(self._link_libs('expat'))}",
                             strict=False)
 
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
-                            "libs = [ \"harfbuzz\" ]", f"libs = {json.dumps(self._link_libs(['harfbuzz']))}",
+                            "libs = [ \"harfbuzz\" ]", f"libs = {json.dumps(self._link_libs('harfbuzz'))}",
                             strict=False)
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
                             "libs += [ \"harfbuzz-subset\" ]", "libs += [ ]", 
@@ -448,7 +451,7 @@ class ConanSkia(ConanFile):
 
         if self.options.use_freetype and self.options.use_system_freetype and self.options.use_conan_freetype:
             replace_in_file(self, join(self.source_folder, "third_party", "freetype2", "BUILD.gn"),
-                            "libs = [ skia_system_freetype2_lib ]", f"libs = {json.dumps(self._link_libs(['freetype']))}",
+                            "libs = [ skia_system_freetype2_lib ]", f"libs = {json.dumps(self._link_libs('freetype'))}",
                             strict=False)
             replace_in_file(self, join(self.source_folder, "third_party", "freetype2", "BUILD.gn"),
                             "include_dirs = [ skia_system_freetype2_include_path ]", "include_dirs = [ ]", 
@@ -456,28 +459,29 @@ class ConanSkia(ConanFile):
 
         if self.options.use_icu and self.options.use_system_icu and self.options.use_conan_icu:
             replace_in_file(self, join(self.source_folder, "third_party", "icu", "BUILD.gn"),
-                            "libs = [ \"icuuc\" ]", f"libs = {json.dumps(self._link_libs(['icu']))}",
+                            # icu-data must come after other components, otherwise it leaves an undefined symbol in shared library. 
+                            "libs = [ \"icuuc\" ]", f"libs = {json.dumps(self._link_libs('icu', components=['icu-uc','icu-data']))}",
                             strict=False)
 
         if (self.options.use_libjpeg_turbo_encode or self.options.use_libjpeg_turbo_decode) and self.options.use_system_libjpeg_turbo and self.options.use_conan_libjpeg_turbo:
             replace_in_file(self, join(self.source_folder, "third_party", "libjpeg-turbo", "BUILD.gn"),
-                            "libs = [ \"jpeg\" ]", f"libs = {json.dumps(self._link_libs(['libjpeg-turbo']))}",
+                            "libs = [ \"jpeg\" ]", f"libs = {json.dumps(self._link_libs('libjpeg-turbo', components=['jpeg']))}",
                             strict=False)
 
         if (self.options.use_libpng_encode or self.options.use_libpng_decode) and self.options.use_system_libpng and self.options.use_conan_libpng:
             replace_in_file(self, join(self.source_folder, "third_party", "libpng", "BUILD.gn"),
-                            "libs = [ \"png\" ]", f"libs = {json.dumps(self._link_libs(['libpng']))}",
+                            "libs = [ \"png\" ]", f"libs = {json.dumps(self._link_libs('libpng'))}",
                             strict=False)
 
         if self.options.use_zlib and self.options.use_system_zlib and self.options.use_conan_zlib:
             replace_in_file(self, join(self.source_folder, "third_party", "zlib", "BUILD.gn"),
-                            "libs = [ \"z\" ]", f"libs = {json.dumps(self._link_libs(['zlib']))}",
+                            "libs = [ \"z\" ]", f"libs = {json.dumps(self._link_libs('zlib'))}",
                             strict=False)
 
         if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp and self.options.use_conan_libwebp:
             replace_in_file(self, join(self.source_folder, "third_party", "libwebp", "BUILD.gn"),
                             "    libs = [\n      \"webp\",\n      \"webpdemux\",\n      \"webpmux\",\n    ]",
-                            f"    libs = {json.dumps(self._link_libs(['libwebp']))}",
+                            f"    libs = {json.dumps(self._link_libs('libwebp',components=['webp','webpmux','webpdemux','sharpyuv']))}",
                             strict=False)
 
         args = ""
@@ -522,6 +526,14 @@ class ConanSkia(ConanFile):
                 ldflags += [f"/LIBPATH:{dir}" for dir in dep.cpp_info.libdirs]
             else:
                 ldflags += [f"-L{dir}" for dir in dep.cpp_info.libdirs]
+
+            for component in dep.cpp_info.components.values():
+                cflags += [f"-I{dir}" for dir in component.includedirs]
+                cflags += [f"-D{define}" for define in component.defines]
+                if is_msvc(self):
+                    ldflags += [f"/LIBPATH:{dir}" for dir in component.libdirs]
+                else:
+                    ldflags += [f"-L{dir}" for dir in component.libdirs]
 
         if is_msvc(self):
             cflags += [f"/{msvc_runtime_flag(self)}"]
