@@ -8,14 +8,16 @@ You can add this repository as [Local Recipes Index Repository](https://docs.con
 
 ## Version
 
-Currently supports following version:
+Currently supports following versions:
 
 * `chrome/m126`
     * `126.20240526.0`
+* `chrome/m127`
+    * `127.20240803.0`
 
 Version numbers are formatted as `(chrome milestone version).(checkout date).0`
 
-If you want to support other versions, please open new issue on Github.  
+If you need other versions, please open new issue on Github.  
 
 ## Requirements
 

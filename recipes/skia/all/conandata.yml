@@ -3,3 +3,7 @@ sources:
     url:
       - "https://github.com/google/skia/archive/69980ce8d04144b41adbc5cc194f29adbc12ceaa.zip"
     sha256: "8096a1f4317cac42e6f868af6cf7c22c5f75cd79e5217ff4be768bae9218168e"
+  "127.20240803.0":
+    url:
+      - "https://github.com/google/skia/archive/1c8089adffdabe3790cc4ca4fb36e24c2f6ab792.zip"
+    sha256: "d00e9d3c00b23cb057ce9a3afccbe8cee15d85135def375265488f974b273290"
