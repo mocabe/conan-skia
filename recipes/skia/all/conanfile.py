@@ -645,6 +645,7 @@ class ConanSkia(ConanFile):
         if self.options.use_direct3d:
             self.cpp_info.defines += ["SK_ENABLE_SPIRV_CROSS"]
             self.cpp_info.defines += ["SK_DIRECT3D"]
+            self.cpp_info.system_libs += ["d3d12", "dxgi", "d3dcompiler"]
 
         if self.options.use_vulkan:
             self.cpp_info.defines += ["SK_VULKAN"]
