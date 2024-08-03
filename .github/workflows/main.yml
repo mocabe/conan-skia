@@ -21,6 +21,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
+        conan-skia-version: ["126.240526.0", "127.20240803.0"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -38,4 +39,4 @@ jobs:
       - name: Install OpenGL via Conan
         run: conan install --requires=opengl/system -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
       - name: Build
-        run:  conan create recipes/skia/all --version=126.20240526.0 -s compiler.cppstd=17 ${{ inputs.conan-options }} --build=missing
+        run:  conan create recipes/skia/all --version=${{ matrix.conan-skia-version }} -s compiler.cppstd=17 ${{ inputs.conan-options }} --build=missing
