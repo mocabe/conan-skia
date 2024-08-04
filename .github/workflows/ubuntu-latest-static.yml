@@ -1,6 +1,6 @@
 name: ubuntu-latest-static
 run-name: ubuntu-latest-static
-on: [push]
+#on: [push]
 jobs:
   conan-create:
     uses: ./.github/workflows/main.yml

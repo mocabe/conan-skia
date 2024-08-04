@@ -1,6 +1,6 @@
 name: android-armv8-static
 run-name: android-armv8-static
-on: [push]
+#on: [push]
 jobs:
   conan-create:
     uses: ./.github/workflows/android-main.yml

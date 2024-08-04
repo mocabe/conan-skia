@@ -1,6 +1,6 @@
 name: windows-latest-shared
 run-name: windows-latest-shared
-on: [push]
+#on: [push]
 jobs:
   conan-create:
     uses: ./.github/workflows/main.yml

@@ -1,6 +1,6 @@
 name: windows-latest-static
 run-name: windows-latest-static
-on: [push]
+#on: [push]
 jobs:
   conan-create:
     uses: ./.github/workflows/main.yml
