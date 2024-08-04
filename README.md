@@ -31,11 +31,11 @@ Tested on following OS (with default options):
 | ------------- | ------ | ------ |
 | Windows         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/windows-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/windows-latest-static.yml/badge.svg) |
 | Macos         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/macos-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/macos-latest-static.yml/badge.svg) |
-| iOS           | [ ]    | [ ]    |
+| iOS           | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ios-armv8-shared.yml/badge.svg)    | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ios-armv8-static.yml/badge.svg)    |
 | Linux         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ubuntu-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ubuntu-latest-static.yml/badge.svg) |
 | Android/arm64 | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv8-shared.yml/badge.svg)    | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv8-static.yml/badge.svg)   |
 | Android/arm32 | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv7-shared.yml/badge.svg)    | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv7-static.yml/badge.svg)   |
-| Emscripten    | [ ]    | [ ]    |
+| Emscripten    |     |     |
 
 ## Bug reports
 
