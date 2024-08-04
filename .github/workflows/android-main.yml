@@ -1,0 +1,21 @@
+name: android-main
+run-name: android-main
+on:
+  workflow_call:
+    inputs:
+      shared:
+        required: true
+        type: string
+      arch:
+        required: false
+        type: string
+jobs:
+  conan-create-android-main:
+    uses: ./.github/workflows/main.yml
+    with:
+        runs-on: ubuntu-latest
+        # Meson builder will receive incorrect paths for dependencies when --sysroot is specified.
+        # Use `sys_root_empty.ini` to workaround it.
+        # https://github.com/conan-io/conan/issues/16468
+        conan-options: -o skia/*:shared=${{ inputs.shared }} -pr:h=./profiles/android-r26d-${{ inputs.arch }}.profile -c "tools.meson.mesontoolchain:extra_machine_files=['$(readlink -f ./profiles/sys_root_empty.ini)']"
+

@@ -33,7 +33,8 @@ Tested on following OS (with default options):
 | Macos         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/macos-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/macos-latest-static.yml/badge.svg) |
 | iOS           | [ ]    | [ ]    |
 | Linux         | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ubuntu-latest-shared.yml/badge.svg) | ![build](https://github.com/mocabe/conan-skia/actions/workflows/ubuntu-latest-static.yml/badge.svg) |
-| Android       | [ ]    | [ ]    |
+| Android/arm64 | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv8-shared.yml/badge.svg)    | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv8-static.yml/badge.svg)   |
+| Android/arm32 | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv7-shared.yml/badge.svg)    | ![build](https://github.com/mocabe/conan-skia/actions/workflows/android-armv7-static.yml/badge.svg)   |
 | Emscripten    | [ ]    | [ ]    |
 
 ## Bug reports

@@ -9,12 +9,6 @@ on:
       conan-options:
         required: false
         type: string
-      conan-profile-build:
-        required: false
-        type: string
-      conan-profile-host:
-        required: false
-        type: string
 jobs:
   conan-create-main:
     runs-on: ${{ inputs.runs-on }}

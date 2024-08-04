@@ -284,7 +284,7 @@ class ConanSkia(ConanFile):
             self.options.use_dng_sdk = enabled 
 
         if self.options.use_ndk_images == None:
-            enabled = os == "Android" and os.api_level >= 30
+            enabled = os == "Android" and int(os.api_level.value) >= 30
             self.options.use_ndk_images = enabled    
 
         if self.options.enable_svg == None:
@@ -488,6 +488,13 @@ class ConanSkia(ConanFile):
         args += "is_official_build=true\n"
         args += f"is_component_build={self._get_lower_bool_str(self.options.shared)}\n"
 
+        if cc := os.environ.get("CC", default=None):
+            args += f"cc={cc}\n"
+        if cxx := os.environ.get("CXX", default=None):
+            args += f"cxx={cxx}\n"
+        if ar := os.environ.get("AR", default=None):
+            args += f"ar={ar}\n"
+
         if self.settings.os == "Windows":
             winsdk_version = self.conf.get("tools.microsoft:winsdk_version", default=None)
             if winsdk_version != None:
@@ -658,6 +665,9 @@ class ConanSkia(ConanFile):
 
         if self.settings.os == "Linux":
             self.cpp_info.defines += ["SK_R32_SHIFT=16"]
+
+        if self.settings.os == "Android":
+            self.cpp_info.system_libs += ["log"]
 
         if self.options.enable_optimize_size:
             self.cpp_info.defines += ["SK_ENABLE_OPTIMIZE_SIZE"]

@@ -1,0 +1,9 @@
+name: android-armv7-static
+run-name: android-armv7-static
+on: [push]
+jobs:
+  conan-create:
+    uses: ./.github/workflows/android-main.yml
+    with:
+        shared: "False"
+        arch: armv7
