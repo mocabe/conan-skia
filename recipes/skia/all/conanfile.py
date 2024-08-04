@@ -558,9 +558,9 @@ class ConanSkia(ConanFile):
 
         if is_apple_os(self):
             min_version_flag = AutotoolsToolchain(self).apple_min_version_flag
-            cflags += min_version_flag
-            ldflags += min_version_flag
-            asmflags += min_version_flag
+            cflags += [min_version_flag]
+            ldflags += [min_version_flag]
+            asmflags += [min_version_flag]
 
         cflags += [f"-D{define}" for define in self.conf.get("tools.build:defines", default=[], check_type=list)]
         ldflags += self.conf.get("tools.build:sharedlinkflags", default=[], check_type=list)
