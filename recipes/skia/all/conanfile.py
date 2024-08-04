@@ -513,7 +513,7 @@ class ConanSkia(ConanFile):
             args += f"ndk_api = {self.settings.os.api_level}\n"
 
         if self._is_ios_variant():
-            args += f"target_os = ios\n"
+            args += f"target_os = \"ios\"\n"
 
         if self._is_ios_variant_simulator():
             args += f"ios_use_simulator = true\n"
