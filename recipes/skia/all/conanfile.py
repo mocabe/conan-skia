@@ -366,7 +366,7 @@ class ConanSkia(ConanFile):
             self.requires("freetype/[>=2.11.1]")
 
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
-            self.requires("harfbuzz/[>=7.3.0]", options = {"with_subset":True})
+            self.requires("harfbuzz/[>=7.3.0]", options = {"with_subset":True, "with_glib":False})
 
         if self.options.use_expat and self.options.use_system_expat and self.options.use_conan_expat:
             self.requires("expat/[>=2.5.0]")
