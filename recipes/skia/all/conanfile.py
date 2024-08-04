@@ -175,9 +175,15 @@ class ConanSkia(ConanFile):
         return (os == "iOS" or os == "watchOS" or os == "tvOS" or os == "visionOS")
 
     def _is_ios_variant_simulator(self):
-        if self._is_ios_variant():
-            sdk = self.settings.os.sdk
-            return (sdk == "iphonesimulator" or sdk == "watchsimulator" or sdk == "appletvsimulator" or sdk == "xrsimulator")
+        os = self.settings.os
+        if os == "iOS" and os.sdk == "iphonesimulator":
+            return True
+        elif os == "watchOS" and os.sdk == "watchsimulator":
+            return True
+        elif os == "tvOS" and os.sdk == "appletvsimulator":
+            return True
+        elif os == "visionOS" and os.sdk == "xrsimulator":
+            return True
         return False
 
     def config_options(self):
