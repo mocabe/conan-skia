@@ -446,7 +446,7 @@ class ConanSkia(ConanFile):
         libs += self._collect_link_libs(self.dependencies[name], components)
 
         frameworks = []
-        frameworks += _collect_link_frameworks(self.dependencies[name], components)
+        frameworks += self._collect_link_frameworks(self.dependencies[name], components)
 
         ext = ""
         if self.settings.os == "Windows":
