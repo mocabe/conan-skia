@@ -490,6 +490,18 @@ class ConanSkia(ConanFile):
                             f"    libs = {json.dumps(self._link_libs('libwebp',components=['webp','webpmux','webpdemux','sharpyuv']))}",
                             strict=False)
 
+        if self._is_ios_variant():
+            if self.settings.arch == "armv8":
+                replace_in_file(self, join(self.source_folder, "gn", "skia", "BUILD.gn"), 
+                    "\"-arch\",\n        \"arm64e\",",
+                    "#\"-arch\",\n        #\"arm64e\",",
+                    strict=False)
+            elif self.settings.arch == "armv8.3":
+                replace_in_file(self, join(self.source_folder, "gn", "skia", "BUILD.gn"), 
+                    "\"-arch\",\n        \"arm64\",",
+                    "#\"-arch\",\n        #\"arm64\",",
+                    strict=False)
+
         args = ""
         args += "is_official_build=true\n"
         args += f"is_component_build={self._get_lower_bool_str(self.options.shared)}\n"
@@ -522,9 +534,11 @@ class ConanSkia(ConanFile):
             args += "target_cpu = \"x86\"\n"
         elif self.settings.arch == "x86_64":
             args += "target_cpu = \"x64\"\n"
-        elif re.match("armv7.*", self.settings.arch.value):
+        elif self.settings.arch == "armv7":
             args += "target_cpu = \"arm\"\n"
-        elif re.match("armv8.*", self.settings.arch.value):
+        elif self.settings.arch == "armv8":
+            args += "target_cpu = \"arm64\"\n"
+        elif self._is_ios_variant() and self.settings.arch == "armv8.3":
             args += "target_cpu = \"arm64\"\n"
         else:
             raise RuntimeError("Unexpected settings.arch")
