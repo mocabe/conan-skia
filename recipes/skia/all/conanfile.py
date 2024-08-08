@@ -408,21 +408,25 @@ class ConanSkia(ConanFile):
         libs = []
         libs += dependency.cpp_info.libs
         libs += dependency.cpp_info.system_libs
+        libs += dependency.cpp_info.frameworks
 
         # The order of components affects link order.
         # TODO: Sould we handle inter-component dependencies?
         for component in components:
             libs += dependency.cpp_info.components[component].libs
             libs += dependency.cpp_info.components[component].system_libs
+            libs += dependency.cpp_info.components[component].frameworks
 
         for transitiveDependency in dependency.dependencies.host.values():
             libs += transitiveDependency.cpp_info.libs
             libs += transitiveDependency.cpp_info.system_libs
+            libs += transitiveDependency.cpp_info.frameworks
 
             # TODO: Is there proper way to determine link order of those components?
             for dep in transitiveDependency.cpp_info.components.values():
                 libs += dep.libs
                 libs += dep.system_libs
+                libs += dep.frameworks
 
         return libs
 
