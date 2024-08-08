@@ -763,6 +763,13 @@ class ConanSkia(ConanFile):
         if self.options.use_dng_sdk and self.options.use_libjpeg_turbo_decode and self.options.use_piex:
             self.cpp_info.defines += ["SK_CODEC_DECODES_RAW"]
 
+        if self.options.use_fonthost_mac:
+            self.cpp_info.defines += ["SK_TYPEFACE_FACTORY_CORETEXT", "SK_FONTMGR_CORETEXT_AVAILABLE"]
+            if self.settings.os == "Macos":
+                self.cpp_info.system_libs += ["AppKit.framework", "ApplicationServices.framework"]
+            elif self._is_ios_variant():
+                self.cpp_info.system_libs += ["CoreFoundation.framework", "CoreGraphics.framework", "CoreText.framework", "UIKit.framework"]
+
         if self.options.enable_fontmgr_android:
             self.cpp_info.defines += ["SK_FONTMGR_ANDROID_AVAILABLE"]
 
@@ -777,6 +784,9 @@ class ConanSkia(ConanFile):
 
         if self.options.enable_fontmgr_fontconfig:
             self.cpp_info.defines += ["SK_FONTMGR_FONTCONFIG_AVAILABLE"]
+
+        if self.options.enable_fontmgr_win:
+            self.cpp_info.defines += ["SK_TYPEFACE_FACTORY_DIRECTWRITE", "SK_FONTMGR_DIRECTWRITE_AVAILABLE"]
 
         if self.options.enable_fontmgr_win_gdi:
             self.cpp_info.defines += ["SK_FONTMGR_GDI_AVAILABLE"]
@@ -829,10 +839,6 @@ class ConanSkia(ConanFile):
                 #self.cpp_info.requires = ["skia", "skunicode"]
             if self.options.use_fonthost_mac:
                 self.cpp_info.defines += ["SK_SHAPER_CORETEXT_AVAILABLE"]
-                if self.settings.os == "Macos":
-                    self.cpp_info.system_libs += ["AppKit.framework", "ApplicationServices.framework"]
-                elif self._is_ios_variant():
-                    self.cpp_info.system_libs += ["CoreFoundation.framework", "CoreGraphics.framework", "CoreText.framework", "UIKit.framework"]
             if self.options.use_harfbuzz:
                 self.cpp_info.defines += ["SK_SHAPER_HARFBUZZ_AVAILABLE"]
             if self.options.shared:
