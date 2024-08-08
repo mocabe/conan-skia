@@ -829,6 +829,10 @@ class ConanSkia(ConanFile):
                 #self.cpp_info.requires = ["skia", "skunicode"]
             if self.options.use_fonthost_mac:
                 self.cpp_info.defines += ["SK_SHAPER_CORETEXT_AVAILABLE"]
+                if self.settings.os == "Macos":
+                    self.cpp_info.system_libs += ["AppKit.framework", "ApplicationServices.framework"]
+                elif self._is_ios_variant():
+                    self.cpp_info.system_libs += ["CoreFoundation.framework", "CoreGraphics.framework", "CoreText.framework", "UIKit.framework"]
             if self.options.use_harfbuzz:
                 self.cpp_info.defines += ["SK_SHAPER_HARFBUZZ_AVAILABLE"]
             if self.options.shared:
