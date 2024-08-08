@@ -4,7 +4,7 @@ from conan.tools.build.flags import cppstd_flag
 from conan.tools.build import check_min_cppstd
 from conan.tools.microsoft import is_msvc
 from conan.tools.microsoft.visual import msvc_runtime_flag
-from conan.tools.apple import is_apple_os, apple_sdk_path
+from conan.tools.apple import is_apple_os, XCRun
 from conan.tools.gnu import AutotoolsToolchain
 from conan.errors import ConanInvalidConfiguration
 
@@ -599,8 +599,11 @@ class ConanSkia(ConanFile):
         args += f"extra_asmflags={json.dumps(asmflags)}\n"
 
         if self.settings.os == "Macos" or self._is_ios_variant():
-            sdk_path = apple_sdk_path(self)
-            args += f"xcode_sysroot=\"{sdk_path}\"\n"
+            sdk_path = self.conf.get("tools.apple:sdk_path", default=None) 
+            if not sdk_path: 
+                sdk_path = XCRun(self).sdk_path
+            if sdk_path:
+                args += f"xcode_sysroot=\"{sdk_path}\"\n"
 
         for key in self._skia_options.keys():
             value = self.options.get_safe(key)
