@@ -408,37 +408,51 @@ class ConanSkia(ConanFile):
         libs = []
         libs += dependency.cpp_info.libs
         libs += dependency.cpp_info.system_libs
-        libs += dependency.cpp_info.frameworks
 
         # The order of components affects link order.
         # TODO: Sould we handle inter-component dependencies?
         for component in components:
             libs += dependency.cpp_info.components[component].libs
             libs += dependency.cpp_info.components[component].system_libs
-            libs += dependency.cpp_info.components[component].frameworks
 
         for transitiveDependency in dependency.dependencies.host.values():
             libs += transitiveDependency.cpp_info.libs
             libs += transitiveDependency.cpp_info.system_libs
-            libs += transitiveDependency.cpp_info.frameworks
 
             # TODO: Is there proper way to determine link order of those components?
             for dep in transitiveDependency.cpp_info.components.values():
                 libs += dep.libs
                 libs += dep.system_libs
-                libs += dep.frameworks
 
         return libs
+
+    def _collect_link_frameworks(self, dependency, components):
+        frameworks = []
+        libs += dependency.cpp_info.frameworks
+
+        for component in components:
+            libs += dependency.cpp_info.components[component].frameworks
+
+        for transitiveDependency in dependency.dependencies.host.values():
+            libs += transitiveDependency.cpp_info.frameworks
+
+            for dep in transitiveDependency.cpp_info.components.values():
+                libs += dep.frameworks
+
+        return frameworks
 
     def _link_libs(self, name, components=[]):
         libs = []
         libs += self._collect_link_libs(self.dependencies[name], components)
 
+        frameworks = []
+        frameworks += _collect_link_frameworks(self.dependencies[name], components)
+
         ext = ""
         if self.settings.os == "Windows":
             ext = ".lib"
 
-        return [lib + ext for lib in libs]
+        return [lib + ext for lib in libs] + [fw + ".framework" for fw in frameworks]
 
     def build(self):
         # activate-emsdk fails on Windows for some reason.
@@ -781,9 +795,9 @@ class ConanSkia(ConanFile):
         if self.options.use_fonthost_mac:
             self.cpp_info.defines += ["SK_TYPEFACE_FACTORY_CORETEXT", "SK_FONTMGR_CORETEXT_AVAILABLE"]
             if self.settings.os == "Macos":
-                self.cpp_info.system_libs += ["AppKit.framework", "ApplicationServices.framework"]
+                self.cpp_info.frameworks += ["AppKit", "ApplicationServices"]
             elif self._is_ios_variant():
-                self.cpp_info.system_libs += ["CoreFoundation.framework", "CoreGraphics.framework", "CoreText.framework", "UIKit.framework"]
+                self.cpp_info.frameworks += ["CoreFoundation", "CoreGraphics", "CoreText", "UIKit"]
 
         if self.options.enable_fontmgr_android:
             self.cpp_info.defines += ["SK_FONTMGR_ANDROID_AVAILABLE"]
