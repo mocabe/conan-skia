@@ -530,7 +530,7 @@ class ConanSkia(ConanFile):
 
         if self.settings.os == "iOS":
             args += f"target_os = \"ios\"\n"
-        elif self settings.os == "tvOS":
+        elif self.settings.os == "tvOS":
             args += f"target_os = \"tvos\"\n"
         elif self._is_ios_variant():
             args += f"target_os = \"ios\"\n"
