@@ -428,16 +428,16 @@ class ConanSkia(ConanFile):
 
     def _collect_link_frameworks(self, dependency, components):
         frameworks = []
-        libs += dependency.cpp_info.frameworks
+        frameworks += dependency.cpp_info.frameworks
 
         for component in components:
-            libs += dependency.cpp_info.components[component].frameworks
+            frameworks += dependency.cpp_info.components[component].frameworks
 
         for transitiveDependency in dependency.dependencies.host.values():
-            libs += transitiveDependency.cpp_info.frameworks
+            frameworks += transitiveDependency.cpp_info.frameworks
 
             for dep in transitiveDependency.cpp_info.components.values():
-                libs += dep.frameworks
+                frameworks += dep.frameworks
 
         return frameworks
 
