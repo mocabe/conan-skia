@@ -445,14 +445,15 @@ class ConanSkia(ConanFile):
         libs = []
         libs += self._collect_link_libs(self.dependencies[name], components)
 
-        frameworks = []
-        frameworks += self._collect_link_frameworks(self.dependencies[name], components)
-
         ext = ""
         if self.settings.os == "Windows":
             ext = ".lib"
 
-        return [lib + ext for lib in libs] + [fw + ".framework" for fw in frameworks]
+        return [lib + ext for lib in libs]
+
+    def _link_frameworks(self, name, components=[]):
+        frameworks = self._collect_link_frameworks(self.dependencies[name], components)
+        return [fw + ".framework" for fw in frameworks]
 
     def build(self):
         # activate-emsdk fails on Windows for some reason.
@@ -467,7 +468,12 @@ class ConanSkia(ConanFile):
 
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
-                            "libs = [ \"harfbuzz\" ]", f"libs = {json.dumps(self._link_libs('harfbuzz'))}",
+                            "libs = [ \"harfbuzz\" ]",
+                            f"libs = {json.dumps(self._link_libs('harfbuzz'))}\n    " +
+                            f"frameworks = {json.dumps(self._link_frameworks('harfbuzz'))}",
+                            strict=False)
+            replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
+                            "include_dirs = [ \"/usr/include/harfbuzz\" ]", "include_dirs = [ ]", 
                             strict=False)
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
                             "libs += [ \"harfbuzz-subset\" ]", "libs += [ ]", 
