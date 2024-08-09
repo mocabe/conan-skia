@@ -4,7 +4,7 @@ from conan.tools.build.flags import cppstd_flag
 from conan.tools.build import check_min_cppstd
 from conan.tools.microsoft import is_msvc
 from conan.tools.microsoft.visual import msvc_runtime_flag
-from conan.tools.apple import is_apple_os
+from conan.tools.apple import is_apple_os, XCRun
 from conan.tools.gnu import AutotoolsToolchain
 from conan.errors import ConanInvalidConfiguration
 
@@ -175,9 +175,15 @@ class ConanSkia(ConanFile):
         return (os == "iOS" or os == "watchOS" or os == "tvOS" or os == "visionOS")
 
     def _is_ios_variant_simulator(self):
-        if self._is_ios_variant():
-            sdk = self.settings.os.sdk
-            return (sdk == "iphonesimulator" or sdk == "watchsimulator" or sdk == "appletvsimulator" or sdk == "xrsimulator")
+        os = self.settings.os
+        if os == "iOS" and os.sdk == "iphonesimulator":
+            return True
+        elif os == "watchOS" and os.sdk == "watchsimulator":
+            return True
+        elif os == "tvOS" and os.sdk == "appletvsimulator":
+            return True
+        elif os == "visionOS" and os.sdk == "xrsimulator":
+            return True
         return False
 
     def config_options(self):
@@ -366,7 +372,7 @@ class ConanSkia(ConanFile):
             self.requires("freetype/[>=2.11.1]")
 
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
-            self.requires("harfbuzz/[>=7.3.0]", options = {"with_subset":True})
+            self.requires("harfbuzz/[>=7.3.0]", options = {"with_subset":True, "with_glib":False})
 
         if self.options.use_expat and self.options.use_system_expat and self.options.use_conan_expat:
             self.requires("expat/[>=2.5.0]")
@@ -420,6 +426,21 @@ class ConanSkia(ConanFile):
 
         return libs
 
+    def _collect_link_frameworks(self, dependency, components):
+        frameworks = []
+        frameworks += dependency.cpp_info.frameworks
+
+        for component in components:
+            frameworks += dependency.cpp_info.components[component].frameworks
+
+        for transitiveDependency in dependency.dependencies.host.values():
+            frameworks += transitiveDependency.cpp_info.frameworks
+
+            for dep in transitiveDependency.cpp_info.components.values():
+                frameworks += dep.frameworks
+
+        return frameworks
+
     def _link_libs(self, name, components=[]):
         libs = []
         libs += self._collect_link_libs(self.dependencies[name], components)
@@ -429,6 +450,10 @@ class ConanSkia(ConanFile):
             ext = ".lib"
 
         return [lib + ext for lib in libs]
+
+    def _link_frameworks(self, name, components=[]):
+        frameworks = self._collect_link_frameworks(self.dependencies[name], components)
+        return [fw + ".framework" for fw in frameworks]
 
     def build(self):
         # activate-emsdk fails on Windows for some reason.
@@ -443,7 +468,12 @@ class ConanSkia(ConanFile):
 
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
-                            "libs = [ \"harfbuzz\" ]", f"libs = {json.dumps(self._link_libs('harfbuzz'))}",
+                            "libs = [ \"harfbuzz\" ]",
+                            f"libs = {json.dumps(self._link_libs('harfbuzz'))}\n    " +
+                            f"frameworks = {json.dumps(self._link_frameworks('harfbuzz'))}",
+                            strict=False)
+            replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
+                            "include_dirs = [ \"/usr/include/harfbuzz\" ]", "include_dirs = [ ]", 
                             strict=False)
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
                             "libs += [ \"harfbuzz-subset\" ]", "libs += [ ]", 
@@ -484,6 +514,18 @@ class ConanSkia(ConanFile):
                             f"    libs = {json.dumps(self._link_libs('libwebp',components=['webp','webpmux','webpdemux','sharpyuv']))}",
                             strict=False)
 
+        if self._is_ios_variant():
+            if self.settings.arch == "armv8":
+                replace_in_file(self, join(self.source_folder, "gn", "skia", "BUILD.gn"), 
+                    "\"-arch\",\n        \"arm64e\",",
+                    "#\"-arch\",\n        #\"arm64e\",",
+                    strict=False)
+            elif self.settings.arch == "armv8.3":
+                replace_in_file(self, join(self.source_folder, "gn", "skia", "BUILD.gn"), 
+                    "\"-arch\",\n        \"arm64\",",
+                    "#\"-arch\",\n        #\"arm64\",",
+                    strict=False)
+
         args = ""
         args += "is_official_build=true\n"
         args += f"is_component_build={self._get_lower_bool_str(self.options.shared)}\n"
@@ -506,8 +548,12 @@ class ConanSkia(ConanFile):
                 args += f"ndk = \"{ndk_path}\"\n"
             args += f"ndk_api = {self.settings.os.api_level}\n"
 
-        if self._is_ios_variant():
-            args += f"target_os = ios\n"
+        if self.settings.os == "iOS":
+            args += f"target_os = \"ios\"\n"
+        elif self.settings.os == "tvOS":
+            args += f"target_os = \"tvos\"\n"
+        elif self._is_ios_variant():
+            args += f"target_os = \"ios\"\n"
 
         if self._is_ios_variant_simulator():
             args += f"ios_use_simulator = true\n"
@@ -516,9 +562,11 @@ class ConanSkia(ConanFile):
             args += "target_cpu = \"x86\"\n"
         elif self.settings.arch == "x86_64":
             args += "target_cpu = \"x64\"\n"
-        elif re.match("armv7.*", self.settings.arch.value):
+        elif self.settings.arch == "armv7":
             args += "target_cpu = \"arm\"\n"
-        elif re.match("armv8.*", self.settings.arch.value):
+        elif self.settings.arch == "armv8":
+            args += "target_cpu = \"arm64\"\n"
+        elif self._is_ios_variant() and self.settings.arch == "armv8.3":
             args += "target_cpu = \"arm64\"\n"
         else:
             raise RuntimeError("Unexpected settings.arch")
@@ -552,9 +600,9 @@ class ConanSkia(ConanFile):
 
         if is_apple_os(self):
             min_version_flag = AutotoolsToolchain(self).apple_min_version_flag
-            cflags += min_version_flag
-            ldflags += min_version_flag
-            asmflags += min_version_flag
+            cflags += [min_version_flag]
+            ldflags += [min_version_flag]
+            asmflags += [min_version_flag]
 
         cflags += [f"-D{define}" for define in self.conf.get("tools.build:defines", default=[], check_type=list)]
         ldflags += self.conf.get("tools.build:sharedlinkflags", default=[], check_type=list)
@@ -573,6 +621,16 @@ class ConanSkia(ConanFile):
         args += f"extra_cflags_cc={json.dumps(cflags_cc)}\n"
         args += f"extra_ldflags={json.dumps(ldflags)}\n"
         args += f"extra_asmflags={json.dumps(asmflags)}\n"
+
+        if self.settings.os == "Macos" or self._is_ios_variant():
+            sdk_path = self.conf.get("tools.apple:sdk_path", default=None) 
+            if not sdk_path: 
+                sdk_path = XCRun(self).sdk_path
+            if sdk_path:
+                args += f"xcode_sysroot=\"{sdk_path}\"\n"
+
+        if self._is_ios_variant():
+            args += f"skia_ios_use_signing = false\n"
 
         for key in self._skia_options.keys():
             value = self.options.get_safe(key)
@@ -743,6 +801,13 @@ class ConanSkia(ConanFile):
         if self.options.use_dng_sdk and self.options.use_libjpeg_turbo_decode and self.options.use_piex:
             self.cpp_info.defines += ["SK_CODEC_DECODES_RAW"]
 
+        if self.options.use_fonthost_mac:
+            self.cpp_info.defines += ["SK_TYPEFACE_FACTORY_CORETEXT", "SK_FONTMGR_CORETEXT_AVAILABLE"]
+            if self.settings.os == "Macos":
+                self.cpp_info.frameworks += ["AppKit", "ApplicationServices"]
+            elif self._is_ios_variant():
+                self.cpp_info.frameworks += ["CoreFoundation", "CoreGraphics", "CoreText", "UIKit"]
+
         if self.options.enable_fontmgr_android:
             self.cpp_info.defines += ["SK_FONTMGR_ANDROID_AVAILABLE"]
 
@@ -757,6 +822,9 @@ class ConanSkia(ConanFile):
 
         if self.options.enable_fontmgr_fontconfig:
             self.cpp_info.defines += ["SK_FONTMGR_FONTCONFIG_AVAILABLE"]
+
+        if self.options.enable_fontmgr_win:
+            self.cpp_info.defines += ["SK_TYPEFACE_FACTORY_DIRECTWRITE", "SK_FONTMGR_DIRECTWRITE_AVAILABLE"]
 
         if self.options.enable_fontmgr_win_gdi:
             self.cpp_info.defines += ["SK_FONTMGR_GDI_AVAILABLE"]
