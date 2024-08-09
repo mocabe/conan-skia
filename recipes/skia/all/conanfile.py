@@ -629,6 +629,9 @@ class ConanSkia(ConanFile):
             if sdk_path:
                 args += f"xcode_sysroot=\"{sdk_path}\"\n"
 
+        if self._is_ios_variant():
+            args += f"skia_ios_use_signing = false\n"
+
         for key in self._skia_options.keys():
             value = self.options.get_safe(key)
             if value != None and not key.startswith("use_conan"):
