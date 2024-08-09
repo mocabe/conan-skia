@@ -1,6 +1,6 @@
 name: macos-latest-shared
 run-name: macos-latest-shared
-#on: [push]
+on: [push]
 jobs:
   conan-create:
     uses: ./.github/workflows/main.yml

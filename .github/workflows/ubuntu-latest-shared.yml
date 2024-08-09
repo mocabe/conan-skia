@@ -1,6 +1,6 @@
 name: ubuntu-latest-shared
 run-name: ubuntu-latest-shared
-#on: [push]
+on: [push]
 jobs:
   conan-create:
     uses: ./.github/workflows/main.yml

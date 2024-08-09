@@ -1,6 +1,6 @@
 name: macos-latest-static
 run-name: macos-latest-static
-#on: [push]
+on: [push]
 jobs:
   conan-create:
     uses: ./.github/workflows/main.yml
