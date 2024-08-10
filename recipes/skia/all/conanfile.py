@@ -911,12 +911,6 @@ class ConanSkia(ConanFile):
             self.cpp_info.libs += ["skresources"]
             #self.cpp_info.requires = ["skia"]
 
-        # component: compression_utils_portable
-
-        if not self.options.shared:
-            self.cpp_info.libs += ["compression_utils_portable"]
-            #self.cpp_info.requires = ["skia"]
-
         # component: skunicode
 
         if self.options.enable_skunicode:
