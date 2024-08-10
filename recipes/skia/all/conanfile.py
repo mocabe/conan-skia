@@ -6,6 +6,7 @@ from conan.tools.microsoft import is_msvc
 from conan.tools.microsoft.visual import msvc_runtime_flag
 from conan.tools.apple import is_apple_os, XCRun
 from conan.tools.gnu import AutotoolsToolchain
+from conan.tools.env import VirtualBuildEnv
 from conan.errors import ConanInvalidConfiguration
 
 from os.path import join
@@ -99,6 +100,20 @@ class ConanSkia(ConanFile):
         "enable_skshaper" : [True, False],
         "enable_bentleyottmann" : [True, False],
         "enable_skparagraph" : [True, False],
+        # canvaskit
+        "canvaskit_enable_alias_font" :  [True, False],
+        "canvaskit_enable_canvas_bindings" :  [True, False],
+        "canvaskit_enable_effects_deserialization" :  [True, False],
+        "canvaskit_enable_embedded_font" :  [True, False],
+        "canvaskit_enable_font" :  [True, False],
+        "canvaskit_enable_matrix_helper" :  [True, False],
+        "canvaskit_enable_pathops" :  [True, False],
+        "canvaskit_enable_rt_shader" :  [True, False],
+        "canvaskit_enable_skp_serialization" :  [True, False],
+        "canvaskit_enable_sksl_trace" :  [True, False],
+        "canvaskit_enable_paragraph" :  [True, False],
+        "canvaskit_enable_webgpu" : [True, False],
+        "canvaskit_enable_webgl" : [True, False],
         # other options
         "enable_precompile" : [True, False],
         "enable_optimize_size" : [True, False],
@@ -108,7 +123,6 @@ class ConanSkia(ConanFile):
 
     _skia_default_options = {
         # configurable dependencies 
-        "use_harfbuzz" : True,
         "use_icu" : True,
         "use_libjpeg_turbo_encode" : True,
         "use_libjpeg_turbo_decode" : True,
@@ -153,7 +167,19 @@ class ConanSkia(ConanFile):
         # modules
         "enable_skshaper" : True,
         "enable_bentleyottmann" : True,
-        "enable_skparagraph" : True,
+        # canvaskit
+        "canvaskit_enable_alias_font" : True,
+        "canvaskit_enable_canvas_bindings" : True,
+        "canvaskit_enable_effects_deserialization" : True,
+        "canvaskit_enable_embedded_font" : True,
+        "canvaskit_enable_font" : True,
+        "canvaskit_enable_matrix_helper" : True,
+        "canvaskit_enable_pathops" : True,
+        "canvaskit_enable_rt_shader" : True,
+        "canvaskit_enable_skp_serialization" : True,
+        "canvaskit_enable_sksl_trace" : True,
+        "canvaskit_enable_webgpu " : False,
+        "canvaskit_enable_webgl " : False,
         # other options
         "enable_precompile" : True,
         "enable_optimize_size" : False,
@@ -199,6 +225,8 @@ class ConanSkia(ConanFile):
             pass
         elif self.settings.arch == "x86_64":
             pass
+        elif self.settings.arch == "wasm":
+            pass
         elif re.match(r'armv7.*', self.settings.arch.value):
             pass
         elif re.match(r'armv8.*', self.settings.arch.value):
@@ -212,6 +240,12 @@ class ConanSkia(ConanFile):
 
         if self.options.shared:
             self.options.rm_safe("fPIC")
+
+        if self.options.use_harfbuzz == None:
+            # Disabled on Emscripten due to false-positive of HAVE_MPROTECT.
+            # Will revisit once 9.0.0 is added to conancenter.
+            enabled = (os != "Emscripten")
+            self.options.use_harfbuzz = enabled
 
         if self.options.use_expat == None:
             enabled = (arch != "wasm")
@@ -262,7 +296,7 @@ class ConanSkia(ConanFile):
             self.options.enable_fontmgr_custom_embedded = enabled
 
         if self.options.enable_fontmgr_custom_empty == None:
-            enabled = self.options.use_freetype and arch != "wasm"
+            enabled = self.options.use_freetype
             self.options.enable_fontmgr_custom_empty = enabled
 
         if self.options.enable_fontmgr_fontconfig == None:
@@ -304,7 +338,15 @@ class ConanSkia(ConanFile):
         if self.options.enable_skunicode == None:
             enabled = self.options.use_icu
             self.options.enable_skunicode = enabled
- 
+
+        if self.options.enable_skparagraph == None:
+            enabled = self.options.enable_skshaper and self.options.enable_skunicode and self.options.use_harfbuzz
+            self.options.enable_skparagraph = enabled
+
+        if self.options.canvaskit_enable_paragraph == None:
+            enabled = self.options.enable_skparagraph
+            self.options.canvaskit_enable_paragraph = enabled
+
         if self.options.gl_standard == None:
             if os == "Macos":
                 self.options.gl_standard = "gl"
@@ -378,7 +420,10 @@ class ConanSkia(ConanFile):
             self.requires("expat/[>=2.5.0]")
 
         if self.options.use_icu and self.options.use_system_icu and self.options.use_conan_icu:
-            self.requires("icu/[>=68.2]")
+            if self.settings.os == "Emscripten":
+                self.requires("icu/[74.2]")
+            else:
+                self.requires("icu/[>=74.2]")
 
         if (self.options.use_libpng_decode or self.options.use_libpng_encode) and self.options.use_system_libpng and self.options.use_conan_libpng:
             self.requires("libpng/[>=1.6.32]")
@@ -530,12 +575,18 @@ class ConanSkia(ConanFile):
         args += "is_official_build=true\n"
         args += f"is_component_build={self._get_lower_bool_str(self.options.shared)}\n"
 
-        if cc := os.environ.get("CC", default=None):
-            args += f"cc={cc}\n"
-        if cxx := os.environ.get("CXX", default=None):
-            args += f"cxx={cxx}\n"
-        if ar := os.environ.get("AR", default=None):
-            args += f"ar={ar}\n"
+        buildenv = VirtualBuildEnv(self).vars()
+
+        if cc := buildenv.get("CC", default=None):
+            args += f"cc=\"{cc}\"\n"
+        if cxx := buildenv.get("CXX", default=None):
+            args += f"cxx=\"{cxx}\"\n"
+        if ar := buildenv.get("AR", default=None):
+            args += f"ar=\"{ar}\"\n"
+
+        if self.settings.os == "Emscripten":
+            if emsdk := buildenv.get("EMSDK", default=None):
+                args += f"skia_emsdk_dir=\"{emsdk}\"\n"
 
         if self.settings.os == "Windows":
             winsdk_version = self.conf.get("tools.microsoft:winsdk_version", default=None)
@@ -562,6 +613,8 @@ class ConanSkia(ConanFile):
             args += "target_cpu = \"x86\"\n"
         elif self.settings.arch == "x86_64":
             args += "target_cpu = \"x64\"\n"
+        elif self.settings.arch == "wasm":
+            args += "target_cpu = \"wasm\"\n"
         elif self.settings.arch == "armv7":
             args += "target_cpu = \"arm\"\n"
         elif self.settings.arch == "armv8":
@@ -664,7 +717,7 @@ class ConanSkia(ConanFile):
 
         copy(self, "*.h", source_folder_include, join(package_folder_include, "include"))
 
-        for mod in ["skottie","skresource", "sksg", "skshaper", "skunicode", "svg"]:
+        for mod in ["skottie", "skresource", "sksg", "skshaper", "skunicode", "svg"]:
             copy(self, "*.h", join(source_folder_modules, mod, "include"), join(package_folder_include_modules, mod, "include"))
 
         # skcms doesn't have include folder for some reason.
@@ -687,6 +740,10 @@ class ConanSkia(ConanFile):
                 copy(self, "*.dylib", build_folder_out, package_folder_lib, keep_path=False)
             else:
                 copy(self, "*.a", build_folder_out, package_folder_lib, keep_path=False)
+
+        if self.settings.os == "Emscripten" and self.settings.arch == "wasm":
+            copy(self, "canvaskit.js", build_folder_out, package_folder_bin)
+            copy(self, "canvaskit.wasm", build_folder_out, package_folder_bin)
 
     def package_info(self):
 
@@ -852,12 +909,6 @@ class ConanSkia(ConanFile):
 
         if not self.options.shared:
             self.cpp_info.libs += ["skresources"]
-            #self.cpp_info.requires = ["skia"]
-
-        # component: compression_utils_portable
-
-        if not self.options.shared:
-            self.cpp_info.libs += ["compression_utils_portable"]
             #self.cpp_info.requires = ["skia"]
 
         # component: skunicode
