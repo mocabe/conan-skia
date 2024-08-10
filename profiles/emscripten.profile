@@ -1,3 +1,5 @@
+include(default)
+
 [settings]
 os=Emscripten
 arch=wasm
