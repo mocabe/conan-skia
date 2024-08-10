@@ -891,25 +891,21 @@ class ConanSkia(ConanFile):
 
         if not self.options.shared:
             self.cpp_info.libs += ["pathkit"]
-            #self.cpp_info.requires = ["skia"]
 
         # component: skcms
 
         if not self.options.shared:
             self.cpp_info.libs += ["skcms"]
-            #self.cpp_info.requires = ["skia"]
 
         # component: sksg
 
         if not self.options.shared:
             self.cpp_info.libs += ["sksg"]
-            #self.cpp_info.requires = ["skia"]
 
         # component: skresource
 
         if not self.options.shared:
             self.cpp_info.libs += ["skresources"]
-            #self.cpp_info.requires = ["skia"]
 
         # component: skunicode
 
@@ -917,15 +913,12 @@ class ConanSkia(ConanFile):
             self.cpp_info.defines += ["SK_UNICODE_AVAILABLE"]
             self.cpp_info.defines += ["SK_UNICODE_ICU_IMPLEMENTATION"]
             self.cpp_info.libs += ["skunicode_core", "skunicode_icu"]
-            #self.cpp_info.requires = ["skia"]
 
         # component: skshaper
 
         if self.options.enable_skshaper:
             self.cpp_info.libs += ["skshaper"]
             self.cpp_info.defines += ["SK_SHAPER_PRIMITIVE_AVAILABLE"]
-            #if self.options.use_harfbuzz and self.options.enable_skunicode:
-                #self.cpp_info.requires = ["skia", "skunicode"]
             if self.options.use_fonthost_mac:
                 self.cpp_info.defines += ["SK_SHAPER_CORETEXT_AVAILABLE"]
             if self.options.use_harfbuzz:
@@ -938,21 +931,18 @@ class ConanSkia(ConanFile):
         if self.options.enable_svg and self.options.use_expat:
             self.cpp_info.defines += ["SK_SVG"]
             self.cpp_info.libs += ["svg"]
-            #self.cpp_info.requires = ["skia", "skresources", "skshaper", "skunicode"]
 
         # component: skottie
 
         if self.options.enable_skottie:
             self.cpp_info.libs += ["skottie"]
             self.cpp_info.defines += ["SK_ENABLE_SKOTTIE", "SK_ENABLE_SKSLEFFECT"]
-            #self.cpp_info.requires = ["skia", "skresources", "sksg", "skshaper", "skunicode"]
 
         # component: bentleyottmann
 
         if self.options.enable_bentleyottmann:
             if not (self.settings.os == "Windows" and self.options.shared):
                 self.cpp_info.libs += ["bentleyottmann"]
-            #self.cpp_info.requires = ["skia"]
 
         # component: skparagraph
 
@@ -960,5 +950,4 @@ class ConanSkia(ConanFile):
             if not (self.settings.os == "Windows" and self.options.shared):
                 self.cpp_info.libs += ["skparagraph"]
             self.cpp_info.defines += ["SK_ENABLE_PARAGRAPH"]
-            #self.cpp_info.requires = ["skia", "skshaper"]
         
