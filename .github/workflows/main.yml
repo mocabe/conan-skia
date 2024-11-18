@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
-        conan-skia-version: ["126.20240526.0", "127.20240803.0"]
+        conan-skia-version: ["126.20240526.0", "127.20240803.0", "128.20241118.0", "129.20241118.0", "130.20241118.0"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
