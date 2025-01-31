@@ -19,3 +19,11 @@ sources:
     url:
       - "https://github.com/google/skia/archive/d41eba845cdb7ade07e68f20676675c25e2734fc.zip"
     sha256: "9e0662def5a76c95b5c43b50be052dab965ae30188a40e8926f19823ae113d03"
+  "131.20250131.0":
+    url:
+      - "https://github.com/google/skia/archive/f14f6b1ab7cf544c0190074488d17821281cfa4d.zip"
+    sha256: "05cee9a0051af3f62cf72dcc9f19151ad17eef3e8e7bac46f8f539d04fce327f"
+  "132.20250131.0":
+    url:
+      - "https://github.com/google/skia/archive/ee9db7d1348f76780fd0184b9b0243d653e36411.zip"
+    sha256: "47285853c86a2a7a0f2ee6cede13043b79a71c0ba1302b70ef63e335d07e8192"
