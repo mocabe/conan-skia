@@ -54,6 +54,7 @@ class ConanSkia(ConanFile):
         # conan library options 
         "use_conan_expat" : [True, False],
         "use_conan_freetype": [True, False],
+        "use_conan_fontconfig": [True, False],
         "use_conan_harfbuzz" : [True, False],
         "use_conan_icu" :[True, False],
         "use_conan_libjpeg_turbo" : [True, False],
@@ -143,6 +144,7 @@ class ConanSkia(ConanFile):
         # conan library options 
         "use_conan_expat" : True,
         "use_conan_freetype": True,
+        "use_conan_fontconfig": True,
         "use_conan_harfbuzz" : True,
         "use_conan_icu" : True,
         "use_conan_libjpeg_turbo" : True,
@@ -415,6 +417,9 @@ class ConanSkia(ConanFile):
 
         if self.options.use_freetype and self.options.use_system_freetype and self.options.use_conan_freetype:
             self.requires("freetype/[>=2.11.1]")
+
+        if self.options.use_fontconfig and self.options.use_conan_fontconfig:
+            self.requires("fontconfig/[>=2.14.2]")
 
         if self.options.use_expat and self.options.use_system_expat and self.options.use_conan_expat:
             self.requires("expat/[>=2.5.0]")
