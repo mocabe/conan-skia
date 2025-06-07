@@ -9,4 +9,4 @@ compiler.libcxx=libc++
 compiler.cppstd=17
 
 [tool_requires]
-*: emsdk/3.1.50
+*: emsdk/3.1.73
