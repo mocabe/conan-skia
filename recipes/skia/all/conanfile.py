@@ -856,6 +856,7 @@ class ConanSkia(ConanFile):
 
         if self.options.use_ndk_images:
             self.cpp_info.defines += ["SK_ENABLE_NDK_IMAGES"]
+            self.cpp_info.system_libs += ["jnigraphics"]
 
         if self.options.use_expat:
             self.cpp_info.defines += ["SK_XML"]
