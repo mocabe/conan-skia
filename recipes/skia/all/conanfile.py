@@ -508,7 +508,21 @@ class ConanSkia(ConanFile):
     def build(self):
         # activate-emsdk fails on Windows for some reason.
         os.environ["GIT_SYNC_DEPS_SKIP_EMSDK"] = "1"
-        self.run("python3 tools/git-sync-deps")
+
+        # times to retry before giving up
+        retries = 3
+
+        # to store git-sync-deps return value
+        gsd_return_value = 1
+
+        for _ in range(retries):
+            gsd_return_value = self.run("python3 tools/git-sync-deps", ignore_errors=True)
+            if gsd_return_value == 0:
+                break
+
+        if gsd_return_value != 0:
+            raise RuntimeError(f"tools/git-sync-deps failed after {retries} attempts")
+
         del os.environ["GIT_SYNC_DEPS_SKIP_EMSDK"]
 
         if self.options.use_expat and self.options.use_system_expat and self.options.use_conan_expat:
