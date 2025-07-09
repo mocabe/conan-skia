@@ -47,3 +47,7 @@ sources:
     url:
       - "https://github.com/google/skia/archive/0dfd95a49aed617f242c8b06dd5b255d1cb07776.zip"
     sha256: "34869886d3ec540cb05c330b34a471126b24131aaff0aa69a1bf4f161d4211f3"
+  "138.20250708.0":
+    url:
+      - "https://github.com/google/skia/archive/a46d5732d9fca93eaec23e502e2eef814b707e6b.zip"
+    sha256: "ef11a5de527636d4278a38b110f290679bf4169653720ff68cb4e148027fec22"
