@@ -733,7 +733,7 @@ class ConanSkia(ConanFile):
 
         copy(self, "*.h", source_folder_include, join(package_folder_include, "include"))
 
-        for mod in ["skottie", "skresource", "sksg", "skshaper", "skunicode", "svg"]:
+        for mod in ["skottie", "skresources", "sksg", "skshaper", "skunicode", "svg"]:
             copy(self, "*.h", join(source_folder_modules, mod, "include"), join(package_folder_include_modules, mod, "include"))
 
         # skcms doesn't have include folder for some reason.
