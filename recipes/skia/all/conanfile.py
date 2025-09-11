@@ -720,6 +720,7 @@ class ConanSkia(ConanFile):
         self.run("ninja -C out/conan")
 
     def package(self):
+        source_folder_source = join(self.source_folder, "src")
         source_folder_include = join(self.source_folder, "include")
         source_folder_modules = join(self.source_folder, "modules")
         package_folder_include = join(self.package_folder, "include")
@@ -733,8 +734,13 @@ class ConanSkia(ConanFile):
 
         copy(self, "*.h", source_folder_include, join(package_folder_include, "include"))
 
+        # Some headers in the src folder are needed by some modules due to internal includes
+        copy(self, "*.h", source_folder_source, join(package_folder_include, "src"))
+
         for mod in ["skottie", "skresources", "sksg", "skshaper", "skunicode", "svg"]:
             copy(self, "*.h", join(source_folder_modules, mod, "include"), join(package_folder_include_modules, mod, "include"))
+            # Some headers in the src folders of the modules are needed due to internal includes
+            copy(self, "*.h", join(source_folder_modules, mod, "src"), join(package_folder_include_modules, mod, "src"))
 
         # skcms doesn't have include folder for some reason.
         copy(self, "*.h", join(source_folder_modules, "skcms"), join(package_folder_include_modules, "skcms"))
