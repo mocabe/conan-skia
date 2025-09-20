@@ -735,7 +735,8 @@ class ConanSkia(ConanFile):
         copy(self, "*.h", source_folder_include, join(package_folder_include, "include"))
 
         # Some headers in the src folder are needed by some modules due to internal includes
-        copy(self, "*.h", source_folder_source, join(package_folder_include, "src"))
+        for dir in ["core", "base"]:
+            copy(self, "*.h", join(source_folder_source, dir), join(package_folder_include, "src", dir))
 
         for mod in ["skottie", "skresources", "sksg", "skshaper", "skunicode", "svg", "skparagraph"]:
             copy(self, "*.h", join(source_folder_modules, mod, "include"), join(package_folder_include_modules, mod, "include"))
