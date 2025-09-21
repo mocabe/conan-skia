@@ -21,7 +21,7 @@ Currently supports following versions:
 * `chrome/m137`
     * `137.20250607.0`
 * `chrome/m138`
-    * `138.20250809.0`
+    * `138.20250708.0`
 
 Version numbers are formatted as `(chrome milestone version).(checkout date).0`
 
