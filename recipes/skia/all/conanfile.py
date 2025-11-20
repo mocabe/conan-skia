@@ -914,7 +914,10 @@ class ConanSkia(ConanFile):
         # component: pathkit
 
         if not self.options.shared:
-            self.cpp_info.libs += ["pathkit"]
+            if self.version == "139.20251120.0":
+                self.cpp_info.libs += ["pathops"]
+            else:
+                self.cpp_info.libs += ["pathkit"]
 
         # component: skcms
 
