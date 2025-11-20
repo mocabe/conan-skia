@@ -437,7 +437,7 @@ class ConanSkia(ConanFile):
             self.requires("libjpeg-turbo/[>=3.0.0]")
 
         if (self.options.use_libwebp_decode or self.options.use_libwebp_encode) and self.options.use_system_libwebp and self.options.use_conan_libwebp:
-            self.requires("libwebp/[>=1.2.4]", options = {"swap_16bit_csp":True})
+            self.requires("libwebp/[>=1.2.4 <1.6.0]", options = {"swap_16bit_csp":True})
 
         if self.options.use_zlib and self.options.use_system_zlib and self.options.use_conan_zlib:
             self.requires("zlib/[>=1.2.11]")
