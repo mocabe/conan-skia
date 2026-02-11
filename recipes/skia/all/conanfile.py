@@ -923,7 +923,7 @@ class ConanSkia(ConanFile):
         if not self.options.shared:
             if self.version == "139.20251120.0":
                 self.cpp_info.libs += ["pathops"]
-            else:
+            elif self.version <= "142.20230509.0":
                 self.cpp_info.libs += ["pathkit"]
 
         # component: skcms
