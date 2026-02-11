@@ -532,7 +532,7 @@ class ConanSkia(ConanFile):
         if self.options.use_harfbuzz and self.options.use_system_harfbuzz and self.options.use_conan_harfbuzz:
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
                             "libs = [ \"harfbuzz\" ]",
-                            f"libs = {json.dumps(self._link_libs('harfbuzz'))}\n    " +
+                            f"libs = {json.dumps(self._link_libs('harfbuzz', components=['core','subset']))}\n    " +
                             f"frameworks = {json.dumps(self._link_frameworks('harfbuzz'))}",
                             strict=False)
             replace_in_file(self, join(self.source_folder, "third_party", "harfbuzz", "BUILD.gn"),
