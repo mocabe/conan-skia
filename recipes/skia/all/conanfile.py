@@ -86,6 +86,7 @@ class ConanSkia(ConanFile):
         "enable_graphite" : [True, False],
         "enable_pdf" : [True, False],
         "enable_winuwp" : [True, False],
+        "enable_win_unicode" : [True, False],
         "enable_fontmgr_android" : [True, False],
         "enable_fontmgr_custom_directory" : [True, False],
         "enable_fontmgr_custom_embedded" : [True, False],
@@ -166,6 +167,7 @@ class ConanSkia(ConanFile):
         "enable_ganesh" : True,
         "enable_graphite" : False,
         "enable_winuwp" : False,
+        "enable_win_unicode" : False,
         # modules
         "enable_skshaper" : True,
         "enable_bentleyottmann" : True,
@@ -658,6 +660,11 @@ class ConanSkia(ConanFile):
                     ldflags += [f"/LIBPATH:{dir}" for dir in component.libdirs]
                 else:
                     ldflags += [f"-L{dir}" for dir in component.libdirs]
+
+        if self.settings.os == "Windows":
+            unicode = self.options.get_safe("enable_win_unicode")
+            if unicode != None:
+                cflags += ["-DUNICODE", "-D_UNICODE"]
 
         if is_msvc(self):
             cflags += [f"/{msvc_runtime_flag(self)}"]
