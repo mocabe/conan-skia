@@ -710,7 +710,7 @@ class ConanSkia(ConanFile):
 
         for key in self._skia_options.keys():
             value = self.options.get_safe(key)
-            if value != None and not key.startswith("use_conan"):
+            if value != None and not key.startswith("use_conan") and key != "enable_win_unicode":
                 b =  self._get_lower_bool_str(value)
                 k = "use_system_freetype2" if key == "use_system_freetype" else key
                 args += f"skia_{k}={b}\n"
