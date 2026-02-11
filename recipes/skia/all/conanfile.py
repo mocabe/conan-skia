@@ -223,7 +223,10 @@ class ConanSkia(ConanFile):
 
     def validate(self):
         if self.settings.compiler.cppstd:
-            check_min_cppstd(self, 17)
+            if (self.version < "144.20260211.0"):
+                check_min_cppstd(self, 17)
+            else:
+                check_min_cppstd(self, 20)
 
         if self.settings.arch == "x86":
             pass

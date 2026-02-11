@@ -31,6 +31,7 @@ If you need other versions, please open new issue on Github.
 ## Requirements
 
 * Since `chrome/m100` Skia requires C++17.
+* Since `chrome/m144` Skia requires C++20.
 
 ## OS
 

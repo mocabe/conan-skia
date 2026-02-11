@@ -7,7 +7,7 @@ arch=armv7
 compiler=clang
 compiler.version=18
 compiler.libcxx=c++_static
-compiler.cppstd=17
+compiler.cppstd=20
 
 [tool_requires]
 android-ndk/r27c

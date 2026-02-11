@@ -33,4 +33,4 @@ jobs:
       - name: Install OpenGL via Conan
         run: conan install --requires=opengl/system -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
       - name: Build
-        run:  conan create recipes/skia/all --version=${{ matrix.conan-skia-version }} -s compiler.cppstd=17 ${{ inputs.conan-options }} --build=missing
+        run:  conan create recipes/skia/all --version=${{ matrix.conan-skia-version }} -s compiler.cppstd=20 ${{ inputs.conan-options }} --build=missing
