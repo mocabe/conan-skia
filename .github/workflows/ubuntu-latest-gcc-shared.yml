@@ -1,0 +1,9 @@
+name: ubuntu-latest-gcc-shared
+run-name: ubuntu-latest-gcc-shared
+on: [push]
+jobs:
+  conan-create:
+    uses: ./.github/workflows/main.yml
+    with:
+        runs-on: ubuntu-latest
+        conan-options: -o skia/*:shared=True -pr:h=./profiles/ubuntu-gcc.profile
