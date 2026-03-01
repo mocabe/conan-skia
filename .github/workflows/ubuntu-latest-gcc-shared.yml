@@ -6,4 +6,4 @@ jobs:
     uses: ./.github/workflows/main.yml
     with:
         runs-on: ubuntu-latest
-        conan-options: -o skia/*:shared=True -pr:h=./profiles/ubuntu-gcc.profile
+        conan-options: -o skia/*:shared=True -pr:a=./profiles/ubuntu-gcc.profile

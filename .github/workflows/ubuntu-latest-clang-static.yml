@@ -6,4 +6,4 @@ jobs:
     uses: ./.github/workflows/main.yml
     with:
         runs-on: ubuntu-latest
-        conan-options: -o skia/*:shared=False  -pr:h=./profiles/ubuntu-clang.profile
+        conan-options: -o skia/*:shared=False  -pr:a=./profiles/ubuntu-clang.profile
