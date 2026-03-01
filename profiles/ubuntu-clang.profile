@@ -9,4 +9,4 @@ compiler.libcxx=libc++
 compiler.version=17
 
 [conf]
-tools.build:compiler_executables={"c": "clang", "cxx": "clang++"}
+tools.build:compiler_executables={"c": "clang", "cpp": "clang++"}

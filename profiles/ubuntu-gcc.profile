@@ -9,4 +9,4 @@ compiler.libcxx=libstdc++11
 compiler.version=13
 
 [conf]
-tools.build:compiler_executables={"c": "gcc", "cxx": "g++"}
+tools.build:compiler_executables={"c": "gcc", "cpp": "g++"}
