@@ -611,7 +611,9 @@ class ConanSkia(ConanFile):
         args = ""
         args += "is_official_build=true\n"
         args += f"is_component_build={self._get_lower_bool_str(self.options.shared)}\n"
-        args += f"is_canvaskit={self._get_lower_bool_str(self.settings.arch == 'wasm')}\n"
+
+        if self.version >= "147.20260704.0":
+            args += f"is_canvaskit={self._get_lower_bool_str(self.settings.arch == 'wasm')}\n"
 
         buildenv = VirtualBuildEnv(self).vars()
 
