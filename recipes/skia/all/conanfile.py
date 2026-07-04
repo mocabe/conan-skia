@@ -406,6 +406,22 @@ class ConanSkia(ConanFile):
         elif not self.options.use_system_zlib: 
             self.options.rm_safe("use_conan_zlib")
 
+        # Remove canvaskit options if not building for wasm.
+        if arch != "wasm":
+            self.options.rm_safe("canvaskit_enable_alias_font")
+            self.options.rm_safe("canvaskit_enable_canvas_bindings")
+            self.options.rm_safe("canvaskit_enable_effects_deserialization")
+            self.options.rm_safe("canvaskit_enable_embedded_font")
+            self.options.rm_safe("canvaskit_enable_font")
+            self.options.rm_safe("canvaskit_enable_matrix_helper")
+            self.options.rm_safe("canvaskit_enable_pathops")
+            self.options.rm_safe("canvaskit_enable_rt_shader")
+            self.options.rm_safe("canvaskit_enable_skp_serialization")
+            self.options.rm_safe("canvaskit_enable_sksl_trace")
+            self.options.rm_safe("canvaskit_enable_paragraph")
+            self.options.rm_safe("canvaskit_enable_webgpu")
+            self.options.rm_safe("canvaskit_enable_webgl")
+
     def export_sources(self):
         export_conandata_patches(self)
 
@@ -595,6 +611,7 @@ class ConanSkia(ConanFile):
         args = ""
         args += "is_official_build=true\n"
         args += f"is_component_build={self._get_lower_bool_str(self.options.shared)}\n"
+        args += f"is_canvaskit={self._get_lower_bool_str(self.settings.arch == 'wasm')}\n"
 
         buildenv = VirtualBuildEnv(self).vars()
 
@@ -713,6 +730,11 @@ class ConanSkia(ConanFile):
 
         for key in self._skia_options.keys():
             value = self.options.get_safe(key)
+
+            # Remove canvaskit options if not building for wasm.
+            if self.settings.arch != "wasm" and key.startswith("canvaskit_"):
+                continue
+
             if value != None and not key.startswith("use_conan") and key != "enable_win_unicode":
                 b =  self._get_lower_bool_str(value)
                 k = "use_system_freetype2" if key == "use_system_freetype" else key
