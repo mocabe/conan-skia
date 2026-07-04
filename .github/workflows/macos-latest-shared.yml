@@ -5,5 +5,5 @@ jobs:
   conan-create:
     uses: ./.github/workflows/main.yml
     with:
-        runs-on: macos-latest
+        runs-on: macos-26
         conan-options: -o skia/*:shared=True
